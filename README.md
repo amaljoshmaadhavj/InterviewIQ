@@ -10,20 +10,20 @@
 
 ---
 
-## ✨ Features
+## Features
 
-- 🎯 **AI Interview Practice**: Practice with intelligent interviewers powered by advanced AI models
-- 📝 **Resume Analysis**: Automatic resume parsing and skill extraction
-- 🎤 **Real-Time Feedback**: Get instant scores and detailed feedback on every answer
-- 📊 **Performance Reports**: Comprehensive interview reports with breakdown analysis
-- 💾 **Interview History**: Track your progress across multiple interviews
-- 🎨 **Professional UI**: Dark theme with smooth animations
-- 🔐 **Secure**: No authentication required for MVP (private deployments)
-- 📱 **Responsive**: Works seamlessly on desktop and mobile
+-  **AI Interview Practice**: Practice with intelligent interviewers powered by advanced AI models
+- **Resume Analysis**: Automatic resume parsing and skill extraction
+- **Real-Time Feedback**: Get instant scores and detailed feedback on every answer
+- **Performance Reports**: Comprehensive interview reports with breakdown analysis
+- **Interview History**: Track your progress across multiple interviews
+- **Professional UI**: Dark theme with smooth animations
+- **Secure**: No authentication required for MVP (private deployments)
+- **Responsive**: Works seamlessly on desktop and mobile
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 InterviewIQ/
@@ -44,7 +44,7 @@ InterviewIQ/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -167,24 +167,9 @@ InterviewIQ/
 
 ---
 
-## 🔌 API Endpoints
 
-All endpoints run on `http://localhost:8000`
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/health` | Health check |
-| POST | `/upload` | Upload and analyze resume |
-| POST | `/interview/start` | Create new interview session |
-| POST | `/interview/chat` | Submit answer and get evaluation |
-| GET | `/interview/report/{session_id}` | Get complete interview report |
-| GET | `/interviews` | Get interview history |
-
-**API Documentation**: http://localhost:8000/docs (Swagger UI)
-
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 - **Framework**: FastAPI 0.109+
@@ -250,29 +235,7 @@ All endpoints run on `http://localhost:8000`
 
 ---
 
-## 🔐 Configuration
 
-### Backend `.env` File
-
-```env
-# Required
-OPENROUTER_API_KEY=your-api-key-here
-
-# Optional
-DATABASE_URL=sqlite:///./interviewiq.db
-API_HOST=0.0.0.0
-API_PORT=8000
-DEBUG=False
-```
-
-### Frontend `.env.local` File
-
-```env
-# API endpoint (default: localhost:8000)
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
-
----
 
 ## 🚀 Deployment
 
@@ -306,83 +269,9 @@ vercel
 
 ---
 
-## 🧪 Testing
 
-### Manual Testing Checklist
 
-- [ ] Backend health check: `curl http://localhost:8000/health`
-- [ ] Resume upload and analysis
-- [ ] Interview session creation
-- [ ] Q&A interaction (5 questions)
-- [ ] Report generation
-- [ ] Interview history tracking
-
-### API Testing
-
-```bash
-# Test health
-curl http://localhost:8000/health
-
-# View API docs
-open http://localhost:8000/docs
-```
-
----
-
-## 📊 Performance
-
-- **Frontend Load**: <2 seconds
-- **Resume Analysis**: 3-5 seconds
-- **Question Generation**: 2-3 seconds
-- **Answer Evaluation**: 2-4 seconds
-- **Database Queries**: <100ms
-
----
-
-## 🐛 Troubleshooting
-
-### "Connection refused" on frontend
-- Verify backend is running: `http://localhost:8000/health`
-- Check `.env.local` for correct API URL
-- Ensure both services are on same network
-
-### "Invalid model ID" error
-- Update `backend/config.py` with correct model names
-- Verify OpenRouter API key in `.env`
-- Check available models: https://openrouter.ai/models
-
-### "npm install" fails with peer dependency errors
-- Use: `npm install --legacy-peer-deps`
-- Or update dependencies to compatible versions
-
-### PDF upload fails
-- Ensure file is valid PDF format
-- Check file size (<10MB)
-- Verify backend logs for parsing errors
-
----
-
-## 📚 Documentation
-
-- **Backend Guide**: [backend/README.md](backend/README.md)
-- **Frontend Guide**: [frontend/FRONTEND_COMPLETE.md](frontend/FRONTEND_COMPLETE.md)
-- **Setup Guide**: [COMPLETE_SETUP_GUIDE.md](COMPLETE_SETUP_GUIDE.md)
-- **API Reference**: [BACKEND_FRONTEND_INTEGRATION.md](BACKEND_FRONTEND_INTEGRATION.md)
-- **Implementation Status**: [IMPLEMENTATION_COMPLETE.md](IMPLEMENTATION_COMPLETE.md)
-
----
-
-## 🎓 Learning Resources
-
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [OpenRouter API Docs](https://openrouter.ai/docs)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-
----
-
-## 🚀 Roadmap
+## Roadmap
 
 ### Phase 1 ✅ (Complete)
 - Project setup and architecture
@@ -404,43 +293,7 @@ open http://localhost:8000/docs
 
 ---
 
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 📞 Support
-
-For issues and questions:
-- 📧 Email: support@interviewiq.com
-- 🐛 Issues: GitHub Issues
-- 💬 Discussions: GitHub Discussions
-
----
-
-## ✨ Acknowledgments
-
-- **OpenRouter** for AI model aggregation
-- **Google Gemini** for resume analysis
-- **Meta LLaMA** for interview questions and evaluation
-- **Next.js** and **FastAPI** communities for excellent frameworks
-
----
-
-## 🎉 Getting Started Now!
+## Getting Started Now!
 
 ```bash
 # Terminal 1 - Backend
@@ -454,4 +307,4 @@ npm run dev
 # Open http://localhost:3000
 ```
 
-**Ready to practice your interviews? Let's go! 🚀**
+**Ready to practice your interviews? Let's go!**

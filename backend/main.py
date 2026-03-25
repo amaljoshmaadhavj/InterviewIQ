@@ -329,8 +329,25 @@ async def interview_chat(
             )
             db.add(next_msg)
         else:
-            # Interview complete - mark completion time
+            # Interview complete - calculate final scores and mark completion
             interview.completed_at = datetime.utcnow()
+            interview.total_questions = question_count
+            
+            # Calculate average score from all evaluations
+            all_messages = db.query(Message).filter(
+                Message.interview_id == interview.id
+            ).all()
+            
+            all_evaluations = [
+                json.loads(m.evaluation_json) 
+                for m in all_messages if m.message_type == "evaluation" and m.evaluation_json
+            ]
+            
+            if all_evaluations:
+                scores = [e.get('score', 5) for e in all_evaluations]
+                avg_score = sum(scores) / len(scores) if scores else 0
+                interview.average_score = round(avg_score, 1)
+                logger.info(f"Interview {session_id} complete - Average score: {interview.average_score}")
         
         response_data = {
             "evaluation": evaluation,
