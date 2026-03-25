@@ -3,15 +3,15 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { CheckCircle, AlertCircle, Download, Home } from 'lucide-react';
 import { api } from '@/services/api';
-import { formatDate, getScoreColor, getRecommendationColor } from '@/utils/helpers';
+import { getScoreColor, getRecommendationColor } from '@/utils/helpers';
 import { cn } from '@/utils/cn';
 import type { InterviewReportResponse } from '@/utils/types';
 
 export default function ReportPage() {
-  const router = useRouter();
+  // const router = useRouter(); // Not needed for report display
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session');
 
@@ -90,8 +90,8 @@ export default function ReportPage() {
     },
   };
 
-  const overallScore = Math.round(report.overall_score);
-  const maxScore = report.total_questions * 10;
+  const overallScore = Math.round(report.average_score);
+  const maxScore = 50; // 5 questions × 10 points max
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
@@ -111,7 +111,7 @@ export default function ReportPage() {
             <CheckCircle className="w-16 h-16 text-green-400 mx-auto" />
           </motion.div>
           <h1 className="text-4xl font-bold mb-2">Interview Complete!</h1>
-          <p className="text-gray-400">{formatDate(new Date(report.created_at))}</p>
+          {/* <p className="text-gray-400">Report generated</p> */}
         </motion.div>
 
         {/* Score Card */}
@@ -163,73 +163,49 @@ export default function ReportPage() {
             <p className="text-white">{report.recommendation}</p>
           </motion.div>
 
-          {/* Evaluation Details */}
-          <motion.div variants={itemVariants} className="space-y-4">
-            <h2 className="text-2xl font-bold">Question Breakdown</h2>
-            {report.evaluations.map((evaluation, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 hover:border-cyan-500/30 transition-all"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-sm text-gray-400">Question {idx + 1}</p>
-                    <h3 className="text-lg font-semibold text-white mt-1">{evaluation.question}</h3>
-                  </div>
-                  <span className={cn('text-2xl font-bold px-3 py-1 rounded', getScoreColor(evaluation.score))}>
-                    {evaluation.score}/10
-                  </span>
-                </div>
+          {/* Strengths and Weaknesses */}
+          <motion.div variants={itemVariants} className="space-y-6">
+            <h2 className="text-2xl font-bold">Performance Breakdown</h2>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Strengths */}
+              <div className="bg-green-500/5 border border-green-500/30 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-green-400 mb-4">✓ Key Strengths</h3>
+                <ul className="space-y-3">
+                  {report.strengths.map((strength: string, idx: number) => (
+                    <motion.li
+                      key={idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="flex items-start gap-3 text-gray-300"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
+                      <span className="text-sm">{strength}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </div>
 
-                <p className="text-gray-300 text-sm mb-4">{evaluation.feedback}</p>
-
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="bg-white/5 rounded p-3">
-                    <p className="text-gray-400 text-xs mb-1">Clarity</p>
-                    <p className="text-cyan-400 font-bold">{evaluation.clarity}/5</p>
-                  </div>
-                  <div className="bg-white/5 rounded p-3">
-                    <p className="text-gray-400 text-xs mb-1">Depth</p>
-                    <p className="text-cyan-400 font-bold">{evaluation.depth}/5</p>
-                  </div>
-                  <div className="bg-white/5 rounded p-3">
-                    <p className="text-gray-400 text-xs mb-1">Relevance</p>
-                    <p className="text-cyan-400 font-bold">{evaluation.relevance}/5</p>
-                  </div>
-                </div>
-
-                {evaluation.strengths && evaluation.strengths.length > 0 && (
-                  <div className="mb-3">
-                    <p className="text-green-400 text-xs font-medium mb-2">✓ Strengths</p>
-                    <ul className="text-gray-300 text-xs space-y-1">
-                      {evaluation.strengths.map((s, i) => (
-                        <li key={i} className="flex gap-2">
-                          <span className="text-green-400">•</span>
-                          <span>{s}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {evaluation.weaknesses && evaluation.weaknesses.length > 0 && (
-                  <div>
-                    <p className="text-orange-400 text-xs font-medium mb-2">⚠ Areas to Improve</p>
-                    <ul className="text-gray-300 text-xs space-y-1">
-                      {evaluation.weaknesses.map((w, i) => (
-                        <li key={i} className="flex gap-2">
-                          <span className="text-orange-400">•</span>
-                          <span>{w}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </motion.div>
-            ))}
+              {/* Weaknesses */}
+              <div className="bg-orange-500/5 border border-orange-500/30 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-orange-400 mb-4">⚠ Areas for Improvement</h3>
+                <ul className="space-y-3">
+                  {report.weaknesses.map((weakness: string, idx: number) => (
+                    <motion.li
+                      key={idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="flex items-start gap-3 text-gray-300"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-orange-400 mt-1.5 flex-shrink-0" />
+                      <span className="text-sm">{weakness}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </motion.div>
 
           {/* Action Buttons */}

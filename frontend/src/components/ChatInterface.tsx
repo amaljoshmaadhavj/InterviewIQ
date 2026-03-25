@@ -7,12 +7,12 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Send, AlertCircle, CheckCircle, Loader } from 'lucide-react';
+import { Send, AlertCircle, Loader } from 'lucide-react';
 import Link from 'next/link';
 import { api } from '@/services/api';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/utils/cn';
-import { formatDate, getScoreColor } from '@/utils/helpers';
+import { getScoreColor } from '@/utils/helpers';
 import type { ChatMessage } from '@/utils/types';
 
 export function ChatInterface() {

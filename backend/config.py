@@ -20,10 +20,25 @@ class Config:
     # API Keys
     OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
     
-    # Models (OpenRouter - updated model IDs)
-    # Note: Check https://openrouter.ai/models for available models
-    RESUME_ANALYSIS_MODEL = "google/gemini-2.0-flash"
-    INTERVIEW_MODEL = "meta-llama/llama-3.3-70b-instruct"
+    # Models - Now configurable via environment variables
+    # Default: gpt-3.5-turbo (fast, cheap, reliable, works well for both tasks)
+    # Alternative: openrouter/auto (automatic model selection)
+    # Resume Analysis Model
+    RESUME_ANALYSIS_MODEL = os.getenv(
+        "RESUME_MODEL",
+        "gpt-3.5-turbo"  # Fast, cheap, perfect for resume analysis
+    )
+    # Interview Q&A Model
+    INTERVIEW_MODEL = os.getenv(
+        "INTERVIEW_MODEL", 
+        "gpt-3.5-turbo"  # Fast, good for question generation and evaluation
+    )
+    
+    # Alternative recommended models (if above don't work):
+    # - "openrouter/auto" - OpenRouter auto-selects best model
+    # - "claude-3-haiku" - Fast, good quality
+    # - "gpt-4-turbo" - More powerful but slower/expensive
+    # Set via environment: RESUME_MODEL=openrouter/auto INTERVIEW_MODEL=claude-3-haiku
     
     # OpenRouter Settings
     OPENROUTER_API_URL = "https://openrouter.ai/api/v1"

@@ -128,6 +128,9 @@ async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_
             analyzer = ResumeAnalyzer()
             resume_data = analyzer.analyze_resume(parse_result["full_text"])
             
+            logger.info(f"Resume data keys: {resume_data.keys()}")
+            logger.info(f"Resume data: {resume_data}")
+            
             response = {
                 "status": "success",
                 "resume_data": resume_data,
@@ -135,6 +138,7 @@ async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_
                 "sections_found": parse_result.get("sections_found", [])
             }
             
+            logger.info(f"Preparing response: {response}")
             logger.info(f"Resume analysis successful for {file.filename}")
             return response
             
@@ -306,11 +310,7 @@ async def interview_chat(
         
         is_complete = question_count >= Config.MAX_QUESTIONS
         
-        response_data = {
-            "evaluation": evaluation,
-            "question_number": question_count,
-            "is_complete": is_complete
-        }
+        next_question = None
         
         if not is_complete:
             # Generate next question
@@ -328,10 +328,16 @@ async def interview_chat(
                 content=next_question
             )
             db.add(next_msg)
-            response_data["next_question"] = next_question
         else:
             # Interview complete - mark completion time
             interview.completed_at = datetime.utcnow()
+        
+        response_data = {
+            "evaluation": evaluation,
+            "question_number": question_count,
+            "is_complete": is_complete,
+            "next_question": next_question
+        }
         
         db.commit()
         logger.info(f"Chat processed for session {session_id}")

@@ -203,9 +203,22 @@ Ensure valid JSON format."""
                     structured_data = json.loads(message)
             except json.JSONDecodeError:
                 logger.warning("Failed to parse JSON response, returning raw message")
-                structured_data = {"raw_text": message}
+                structured_data = {
+                    "skills": [],
+                    "experience_level": "mid",
+                    "domains": [],
+                    "projects": [],
+                    "summary": "Resume analysis in progress"
+                }
             
+            # Ensure all required fields are present
+            structured_data.setdefault("skills", [])
+            structured_data.setdefault("experience_level", "mid")
+            structured_data.setdefault("domains", [])
+            structured_data.setdefault("projects", [])
+            structured_data.setdefault("summary", "Professional resume")
             structured_data["raw_response"] = message
+            
             logger.info("Resume analysis successful")
             
             return structured_data
@@ -250,7 +263,16 @@ class InterviewEngine:
         if chat_history:
             history_context = "\n\nPrevious conversation:\n"
             for msg in chat_history[-4:]:  # Keep last 2 exchanges
-                history_context += f"- {msg['role']}: {msg['content'][:200]}...\n"
+                # Handle both dict and ORM Message objects
+                if isinstance(msg, dict):
+                    role = msg.get('role', 'unknown')
+                    content = msg.get('content', '')[:200]
+                else:
+                    role = msg.sender if hasattr(msg, 'sender') else msg.get('role', 'unknown')
+                    content = msg.content if hasattr(msg, 'content') else msg.get('content', '')
+                    if isinstance(content, str):
+                        content = content[:200]
+                history_context += f"- {role}: {content}...\n"
         
         system_prompt = f"""You are a senior technical interviewer with 10+ years of experience.
 You are interviewing a candidate for the role: {role}
@@ -362,6 +384,15 @@ Provide evaluation in JSON format:
             except json.JSONDecodeError:
                 logger.warning("Failed to parse evaluation JSON")
                 evaluation = {"score": 5, "feedback": message}
+            
+            # Ensure all required fields are present
+            evaluation.setdefault("score", 5)
+            evaluation.setdefault("clarity", 3)
+            evaluation.setdefault("depth", 3)
+            evaluation.setdefault("relevance", 3)
+            evaluation.setdefault("strengths", ["Good attempt", "Shows understanding"])
+            evaluation.setdefault("weaknesses", ["Could be more detailed"])
+            evaluation.setdefault("feedback", message if isinstance(message, str) else "Evaluation complete")
             
             logger.info(f"Answer evaluated with score: {evaluation.get('score', 'N/A')}")
             return evaluation

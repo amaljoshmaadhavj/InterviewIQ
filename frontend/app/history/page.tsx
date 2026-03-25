@@ -18,7 +18,7 @@ export default function HistoryPage() {
     const loadHistory = async () => {
       try {
         const data = await api.getInterviewHistory();
-        setInterviews(data);
+        setInterviews(data.interviews || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load history');
       } finally {
@@ -97,7 +97,7 @@ export default function HistoryPage() {
             animate="visible"
             className="space-y-4"
           >
-            {interviews.map((interview, idx) => (
+            {interviews.map((interview) => (
               <motion.div
                 key={interview.session_id}
                 variants={itemVariants}
@@ -107,11 +107,11 @@ export default function HistoryPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-white">{interview.role}</h3>
-                      <span className={cn('px-3 py-1 rounded text-xs font-medium', getScoreColor(interview.score))}>
+                      <span className={cn('px-3 py-1 rounded text-xs font-medium', getScoreColor(interview.score || 0))}>
                         {interview.score}/10
                       </span>
                     </div>
-                    <p className="text-sm text-gray-400">{formatDate(new Date(interview.created_at))}</p>
+                    <p className="text-sm text-gray-400">{formatDate(new Date(interview.created_at || new Date()))}</p>
                   </div>
 
                   <div className="flex items-center gap-4">
@@ -120,7 +120,7 @@ export default function HistoryPage() {
                       <div className="w-24 bg-gray-800 rounded-full h-2 mt-1">
                         <div
                           className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${(interview.score / 10) * 100}%` }}
+                          style={{ width: `${((interview.score || 0) / 10) * 100}%` }}
                         />
                       </div>
                     </div>
