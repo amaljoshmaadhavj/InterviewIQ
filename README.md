@@ -235,42 +235,6 @@ InterviewIQ/
 
 ---
 
-
-
-## 🚀 Deployment
-
-### Deploy Backend to Production
-
-**Option 1: Railway** (Recommended)
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login and deploy
-railway login
-railway up
-```
-
-**Option 2: Docker**
-```bash
-docker build -t interviewiq-backend .
-docker run -p 8000:8000 -e OPENROUTER_API_KEY=your-key interviewiq-backend
-```
-
-### Deploy Frontend to Vercel
-
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel
-```
-
----
-
-
-
 ## Roadmap
 
 ### Phase 1 ✅ (Complete)

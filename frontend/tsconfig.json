@@ -25,26 +25,13 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     /* Path mapping */
-    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/components/*": [
-        "./src/components/*"
-      ],
-      "@/services/*": [
-        "./src/services/*"
-      ],
-      "@/context/*": [
-        "./src/context/*"
-      ],
-      "@/utils/*": [
-        "./src/utils/*"
-      ],
-      "@/providers": [
-        "./src/providers"
-      ]
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/services/*": ["./src/services/*"],
+      "@/context/*": ["./src/context/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/providers": ["./src/providers"]
     },
     "allowJs": true,
     "incremental": true,

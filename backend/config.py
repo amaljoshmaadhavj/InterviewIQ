@@ -55,7 +55,7 @@ class Config:
     
     # Interview Settings
     MAX_API_CALLS_PER_SESSION = 3
-    MAX_QUESTIONS = 5
+    MAX_QUESTIONS = 15
     INTERVIEW_TIMEOUT = 3600  # 1 hour in seconds
 
 
