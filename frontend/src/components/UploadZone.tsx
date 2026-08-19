@@ -19,7 +19,7 @@ interface UploadZoneProps {
 
 export function UploadZone({ onUploadComplete }: UploadZoneProps) {
   const router = useRouter();
-  const { setResumeData, setLoading, setError } = useApp();
+  const { setResumeData, setFileName, setSectionsFound, setLoading, setError } = useApp();
 
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -65,6 +65,8 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
 
         // Store resume data globally
         setResumeData(response.resume_data);
+        setFileName(response.file_name);
+        setSectionsFound(response.sections_found);
 
         // Wait for animation to complete
         setTimeout(() => {
@@ -83,7 +85,7 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
         setError(errorMessage);
       }
     },
-    [setResumeData, setLoading, setError, onUploadComplete, router]
+    [setResumeData, setFileName, setSectionsFound, setLoading, setError, onUploadComplete, router]
   );
 
   const handleDragOver = (e: React.DragEvent) => {

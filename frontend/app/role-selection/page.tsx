@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { RoleSelector } from '@/components/RoleSelector';
+import { ResumePreview } from '@/components/ResumePreview';
 import { useApp } from '@/context/AppContext';
 import { useRouter } from 'next/navigation';
 
@@ -18,6 +19,9 @@ export default function RoleSelectionPage() {
 
   return (
     <div className="min-h-screen pt-20 pb-16">
+      <div className="max-w-6xl mx-auto px-4">
+        <ResumePreview fileName={state.fileName} sectionsFound={state.sectionsFound} />
+      </div>
       <RoleSelector />
     </div>
   );

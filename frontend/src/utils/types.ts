@@ -78,6 +78,8 @@ export interface InterviewState {
   chatHistory: ChatMessage[];
   isLoading: boolean;
   error: string | null;
+  fileName?: string;
+  sectionsFound?: string[];
 }
 
 export interface ChatMessage {
@@ -98,5 +100,7 @@ export interface AppContextType {
   addChatMessage: (message: ChatMessage) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  setFileName: (fileName: string | undefined) => void;
+  setSectionsFound: (sections: string[] | undefined) => void;
   resetInterview: () => void;
 }

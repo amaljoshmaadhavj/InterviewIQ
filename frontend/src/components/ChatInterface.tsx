@@ -7,20 +7,25 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Send, AlertCircle, Loader } from 'lucide-react';
+import { Send, AlertCircle, Loader, SkipForward, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/utils/cn';
 import { getScoreColor } from '@/utils/helpers';
 import type { ChatMessage } from '@/utils/types';
 
+const SKIP_MARKER = '__SKIP_QUESTION__';
+
 export function ChatInterface() {
-  const { state, addChatMessage, setCurrentQuestion, setLoading, setError } = useApp();
+  const router = useRouter();
+  const { state, addChatMessage, setCurrentQuestion, setLoading, setError, resetInterview } = useApp();
   const [input, setInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(1);
   const [isInterviewComplete, setIsInterviewComplete] = useState(false);
+  const [failedAnswer, setFailedAnswer] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom
@@ -28,76 +33,100 @@ export function ChatInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [state.chatHistory]);
 
-  const handleSubmitAnswer = useCallback(async () => {
-    if (!input.trim() || !state.sessionId) return;
+  const submitAnswerCore = useCallback(
+    async (answer: string, isSkip = false) => {
+      if (!state.sessionId) return;
 
-    const userAnswer = input.trim();
-    setInput('');
-
-    // Add user message to chat
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      type: 'answer',
-      sender: 'candidate',
-      content: userAnswer,
-      timestamp: new Date(),
-    };
-    addChatMessage(userMessage);
-
-    setIsSubmitting(true);
-    setLoading(true);
-
-    try {
-      const response = await api.submitAnswer({
-        session_id: state.sessionId,
-        answer: userAnswer,
-      });
-
-      // Add evaluation message
-      const evaluationMessage: ChatMessage = {
-        id: `eval-${Date.now()}`,
-        type: 'evaluation',
-        sender: 'interviewer',
-        content: response.evaluation.feedback,
-        evaluation: response.evaluation,
+      // Add user message to chat (or a skip marker)
+      const userMessage: ChatMessage = {
+        id: isSkip ? `skip-${Date.now()}` : `user-${Date.now()}`,
+        type: 'answer',
+        sender: 'candidate',
+        content: isSkip ? '⏭ (Skipped this question)' : answer,
         timestamp: new Date(),
       };
-      addChatMessage(evaluationMessage);
+      addChatMessage(userMessage);
 
-      setQuestionNumber(response.question_number);
+      setIsSubmitting(true);
+      setLoading(true);
+      setFailedAnswer(null);
 
-      if (response.is_complete) {
-        setIsInterviewComplete(true);
-      } else if (response.next_question) {
-        // Add next question
-        const nextQuestionMessage: ChatMessage = {
-          id: `q-${Date.now()}`,
-          type: 'question',
+      try {
+        const response = await api.submitAnswer({
+          session_id: state.sessionId,
+          answer,
+        });
+
+        // Add evaluation message
+        const evaluationMessage: ChatMessage = {
+          id: `eval-${Date.now()}`,
+          type: 'evaluation',
           sender: 'interviewer',
-          content: response.next_question,
+          content: response.evaluation.feedback,
+          evaluation: response.evaluation,
           timestamp: new Date(),
         };
-        addChatMessage(nextQuestionMessage);
-        setCurrentQuestion(response.next_question);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to submit answer';
-      setError(errorMessage);
+        addChatMessage(evaluationMessage);
 
-      // Add error message
-      const errorChatMessage: ChatMessage = {
-        id: `error-${Date.now()}`,
-        type: 'question',
-        sender: 'interviewer',
-        content: `Error: ${errorMessage}`,
-        timestamp: new Date(),
-      };
-      addChatMessage(errorChatMessage);
-    } finally {
-      setIsSubmitting(false);
-      setLoading(false);
-    }
-  }, [input, state.sessionId, addChatMessage, setCurrentQuestion, setLoading, setError]);
+        setQuestionNumber(response.question_number);
+
+        if (response.is_complete) {
+          setIsInterviewComplete(true);
+        } else if (response.next_question) {
+          // Add next question
+          const nextQuestionMessage: ChatMessage = {
+            id: `q-${Date.now()}`,
+            type: 'question',
+            sender: 'interviewer',
+            content: response.next_question,
+            timestamp: new Date(),
+          };
+          addChatMessage(nextQuestionMessage);
+          setCurrentQuestion(response.next_question);
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to submit answer';
+        setError(errorMessage);
+        setFailedAnswer(answer);
+
+        // Add error message
+        const errorChatMessage: ChatMessage = {
+          id: `error-${Date.now()}`,
+          type: 'question',
+          sender: 'interviewer',
+          content: `Error: ${errorMessage}`,
+          timestamp: new Date(),
+        };
+        addChatMessage(errorChatMessage);
+      } finally {
+        setIsSubmitting(false);
+        setLoading(false);
+      }
+    },
+    [state.sessionId, addChatMessage, setCurrentQuestion, setLoading, setError]
+  );
+
+  const handleSubmitAnswer = useCallback(async () => {
+    if (!input.trim() || !state.sessionId) return;
+    const userAnswer = input.trim();
+    setInput('');
+    await submitAnswerCore(userAnswer, false);
+  }, [input, state.sessionId, submitAnswerCore]);
+
+  const handleSkipQuestion = useCallback(() => {
+    if (isSubmitting || isInterviewComplete || !state.sessionId) return;
+    submitAnswerCore(SKIP_MARKER, true);
+  }, [isSubmitting, isInterviewComplete, state.sessionId, submitAnswerCore]);
+
+  const handleRetryAnswer = useCallback(() => {
+    if (!failedAnswer || isSubmitting) return;
+    submitAnswerCore(failedAnswer, false);
+  }, [failedAnswer, isSubmitting, submitAnswerCore]);
+
+  const handleNewInterview = useCallback(() => {
+    resetInterview();
+    router.push('/');
+  }, [resetInterview, router]);
 
   // Handle Enter key
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -245,45 +274,83 @@ export function ChatInterface() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-2"
+            className="space-y-3"
           >
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={isSubmitting}
-              placeholder="Type your response... (Shift+Enter for new line)"
-              className={cn(
-                'flex-1 p-4 rounded-lg bg-gray-900 border border-gray-700',
-                'text-white placeholder-gray-500',
-                'focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500',
-                'resize-none',
-                'disabled:opacity-50'
-              )}
-              rows={3}
-            />
-            <button
-              onClick={handleSubmitAnswer}
-              disabled={!input.trim() || isSubmitting}
-              className={cn(
-                'p-4 rounded-lg transition-all duration-200',
-                'flex items-center justify-center',
-                input.trim() && !isSubmitting
-                  ? 'bg-cyan-500 text-white hover:bg-cyan-600 cursor-pointer'
-                  : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-              )}
-            >
-              {isSubmitting ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity }}
+            {failedAnswer && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between gap-3 p-3 bg-orange-400/10 border border-orange-400/30 rounded-lg"
+              >
+                <p className="text-orange-300 text-sm">Your last answer failed to send.</p>
+                <button
+                  onClick={handleRetryAnswer}
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 flex-shrink-0"
                 >
-                  <Loader className="w-5 h-5" />
-                </motion.div>
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </button>
+                  <RotateCcw className="w-4 h-4" />
+                  Retry
+                </button>
+              </motion.div>
+            )}
+
+            <div className="flex gap-2">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isSubmitting}
+                placeholder="Type your response... (Shift+Enter for new line)"
+                className={cn(
+                  'flex-1 p-4 rounded-lg bg-gray-900 border border-gray-700',
+                  'text-white placeholder-gray-500',
+                  'focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500',
+                  'resize-none',
+                  'disabled:opacity-50'
+                )}
+                rows={3}
+              />
+              <button
+                onClick={handleSubmitAnswer}
+                disabled={!input.trim() || isSubmitting}
+                className={cn(
+                  'p-4 rounded-lg transition-all duration-200',
+                  'flex items-center justify-center',
+                  input.trim() && !isSubmitting
+                    ? 'bg-cyan-500 text-white hover:bg-cyan-600 cursor-pointer'
+                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                )}
+              >
+                {isSubmitting ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    <Loader className="w-5 h-5" />
+                  </motion.div>
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+
+            {/* Skip Question */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={handleSkipQuestion}
+                disabled={isSubmitting}
+                className={cn(
+                  'flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200',
+                  isSubmitting
+                    ? 'text-gray-600 cursor-not-allowed'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                )}
+              >
+                <SkipForward className="w-4 h-4" />
+                Skip Question
+              </button>
+              <p className="text-xs text-gray-500">Skipping counts as a low score for that question</p>
+            </div>
           </motion.div>
         ) : (
           <motion.div
@@ -297,12 +364,12 @@ export function ChatInterface() {
             >
               View Report
             </Link>
-            <Link
-              href="/"
+            <button
+              onClick={handleNewInterview}
               className="px-8 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 font-semibold text-center"
             >
               Start New Interview
-            </Link>
+            </button>
           </motion.div>
         )}
       </div>

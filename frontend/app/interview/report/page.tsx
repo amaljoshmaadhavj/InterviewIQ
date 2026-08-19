@@ -1,23 +1,43 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle, AlertCircle, Download, Home } from 'lucide-react';
+import { CheckCircle, AlertCircle, Download, Share2, Home, Check } from 'lucide-react';
 import { api } from '@/services/api';
+import { useNewInterview } from '@/hooks/useNewInterview';
 import { getScoreColor, getRecommendationColor } from '@/utils/helpers';
 import { cn } from '@/utils/cn';
 import type { InterviewReportResponse } from '@/utils/types';
 
 export default function ReportPage() {
-  // const router = useRouter(); // Not needed for report display
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen pt-24 flex items-center justify-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-12 h-12 border-4 border-gray-700 border-t-cyan-500 rounded-full"
+          />
+        </div>
+      }
+    >
+      <ReportPageContent />
+    </Suspense>
+  );
+}
+
+function ReportPageContent() {
+  const startNewInterview = useNewInterview();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session');
 
   const [report, setReport] = useState<InterviewReportResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared' | 'failed'>('idle');
 
   useEffect(() => {
     const loadReport = async () => {
@@ -39,6 +59,70 @@ export default function ReportPage() {
 
     loadReport();
   }, [sessionId]);
+
+  const buildReportText = useCallback((r: InterviewReportResponse): string => {
+    const lines = [
+      'InterviewIQ - Interview Report',
+      '==============================',
+      '',
+      `Role: ${r.role}`,
+      `Overall Score: ${Math.round(r.average_score)}/10`,
+      `Recommendation: ${r.recommendation}`,
+      `API Calls Used: ${r.api_calls_used}`,
+      '',
+      'Key Strengths:',
+      ...r.strengths.map((s) => `- ${s}`),
+      '',
+      'Areas for Improvement:',
+      ...r.weaknesses.map((w) => `- ${w}`),
+      '',
+      `View online: ${window.location.href}`,
+    ];
+    return lines.join('\n');
+  }, []);
+
+  const handleDownloadReport = useCallback(() => {
+    if (!report) return;
+    const text = buildReportText(report);
+    const blob = new Blob([text], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interviewiq-report-${report.session_id.slice(0, 8)}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [report, buildReportText]);
+
+  const handleShareReport = useCallback(async () => {
+    if (!report) return;
+    const text = buildReportText(report);
+    const shareData = { title: 'InterviewIQ Report', text };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        setShareState('shared');
+      } else {
+        await navigator.clipboard.writeText(text);
+        setShareState('copied');
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        setShareState('idle');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        setShareState('copied');
+      } catch {
+        setShareState('failed');
+      }
+    } finally {
+      setTimeout(() => setShareState('idle'), 3000);
+    }
+  }, [report, buildReportText]);
 
   if (isLoading) {
     return (
@@ -91,7 +175,7 @@ export default function ReportPage() {
   };
 
   const overallScore = Math.round(report.average_score);
-  const maxScore = 50; // 5 questions × 10 points max
+  const maxScore = 10;
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
@@ -213,9 +297,27 @@ export default function ReportPage() {
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
           >
-            <button className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-2 border border-gray-700">
+            <button
+              onClick={handleDownloadReport}
+              className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-2 border border-gray-700"
+            >
               <Download className="w-5 h-5" />
               Download Report
+            </button>
+            <button
+              onClick={handleShareReport}
+              className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 flex items-center justify-center gap-2 border border-gray-700"
+            >
+              {shareState === 'copied' ? (
+                <Check className="w-5 h-5 text-green-400" />
+              ) : (
+                <Share2 className="w-5 h-5" />
+              )}
+              {shareState === 'copied'
+                ? 'Copied to Clipboard'
+                : shareState === 'failed'
+                  ? 'Copy Failed'
+                  : 'Share Report'}
             </button>
             <Link
               href="/history"
@@ -223,13 +325,13 @@ export default function ReportPage() {
             >
               View History
             </Link>
-            <Link
-              href="/"
+            <button
+              onClick={startNewInterview}
               className="px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-all duration-200 flex items-center justify-center gap-2"
             >
               <Home className="w-5 h-5" />
               New Interview
-            </Link>
+            </button>
           </motion.div>
         </motion.div>
       </div>

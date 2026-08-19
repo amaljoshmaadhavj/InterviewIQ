@@ -59,6 +59,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({ ...prev, error }));
   }, []);
 
+  const setFileName = useCallback((fileName: string | undefined) => {
+    setState((prev) => ({ ...prev, fileName }));
+  }, []);
+
+  const setSectionsFound = useCallback((sections: string[] | undefined) => {
+    setState((prev) => ({ ...prev, sectionsFound: sections }));
+  }, []);
+
   const resetInterview = useCallback(() => {
     setState(defaultState);
   }, []);
@@ -72,6 +80,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     addChatMessage,
     setLoading,
     setError,
+    setFileName,
+    setSectionsFound,
     resetInterview,
   };
 
