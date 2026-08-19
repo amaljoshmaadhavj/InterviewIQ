@@ -30,15 +30,15 @@ function ScoreRing({ score }: { score: number }) {
     score >= 8
       ? 'stroke-emerald-400'
       : score >= 6
-        ? 'stroke-violet-400'
+        ? 'stroke-blue-400'
         : score >= 4
           ? 'stroke-amber-400'
-          : 'stroke-red-400';
+          : 'stroke-rose-400';
 
   return (
     <div className="relative w-40 h-40">
       <svg className="w-full h-full -rotate-90" viewBox="0 0 128 128">
-        <circle cx="64" cy="64" r={radius} fill="none" strokeWidth="9" className="stroke-slate-800" />
+        <circle cx="64" cy="64" r={radius} fill="none" strokeWidth="9" className="stroke-slate-100" />
         <motion.circle
           cx="64"
           cy="64"
@@ -56,7 +56,7 @@ function ScoreRing({ score }: { score: number }) {
         <span className={cn('text-4xl font-extrabold tracking-tight', getScoreColor(score))}>
           {score}
         </span>
-        <span className="text-xs text-slate-500 font-medium">/10</span>
+        <span className="text-xs text-slate-400 font-semibold">/10</span>
       </div>
     </div>
   );
@@ -70,7 +70,7 @@ export default function ReportPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-12 h-12 border-2 border-slate-700 border-t-violet-400 rounded-full"
+            className="w-12 h-12 border-2 border-blue-200 border-t-blue-500 rounded-full"
           />
         </div>
       }
@@ -181,7 +181,7 @@ function ReportPageContent() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="w-12 h-12 border-2 border-slate-700 border-t-violet-400 rounded-full"
+          className="w-12 h-12 border-2 border-blue-200 border-t-blue-500 rounded-full"
         />
       </div>
     );
@@ -195,11 +195,11 @@ function ReportPageContent() {
           animate={{ opacity: 1, y: 0 }}
           className="card max-w-md w-full text-center p-8"
         >
-          <div className="p-3 rounded-2xl bg-red-500/10 border border-red-400/25 w-fit mx-auto mb-5">
-            <AlertCircle className="w-8 h-8 text-red-400" />
+          <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 w-fit mx-auto mb-5">
+            <AlertCircle className="w-8 h-8 text-rose-500" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Unable to Load Report</h1>
-          <p className="text-slate-400 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold mb-2 text-slate-800">Unable to Load Report</h1>
+          <p className="text-slate-500 mb-6">{error}</p>
           <Link href="/" className="btn btn-primary btn-md">
             Back to Home
           </Link>
@@ -222,7 +222,6 @@ function ReportPageContent() {
   return (
     <div className="min-h-screen pt-28 pb-16 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -234,16 +233,15 @@ function ReportPageContent() {
             transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
             className="mx-auto mb-6"
           >
-            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-400/25 w-fit mx-auto">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 w-fit mx-auto shadow-card">
+              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
             </div>
           </motion.div>
-          <h1 className="text-4xl font-bold tracking-tight mb-3">Interview Complete!</h1>
-          <p className="text-slate-400">Here&apos;s your performance breakdown for {report.role}</p>
+          <h1 className="text-4xl font-extrabold tracking-tight mb-3 text-slate-900">Interview Complete!</h1>
+          <p className="text-slate-500">Here&apos;s your performance breakdown for {report.role}</p>
         </motion.div>
 
         <div className="space-y-6">
-          {/* Score + Recommendation */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -252,52 +250,50 @@ function ReportPageContent() {
           >
             <div className="grid sm:grid-cols-2 gap-8 items-center">
               <div className="flex flex-col items-center">
-                <p className="text-sm font-semibold tracking-wider text-slate-500 mb-4">OVERALL SCORE</p>
+                <p className="text-sm font-bold tracking-wider text-slate-400 mb-4">OVERALL SCORE</p>
                 <ScoreRing score={overallScore} />
-                <p className="text-slate-400 text-sm mt-4">{verdict}</p>
+                <p className="text-slate-500 text-sm mt-4">{verdict}</p>
               </div>
 
               <div className="space-y-4">
                 <div className={cn('p-4 rounded-xl border', getRecommendationColor(report.recommendation))}>
-                  <p className="text-xs font-semibold tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                  <p className="text-xs font-bold tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" /> RECOMMENDATION
                   </p>
-                  <p className="text-white font-medium text-sm leading-relaxed">{report.recommendation}</p>
+                  <p className="text-slate-800 font-semibold text-sm leading-relaxed">{report.recommendation}</p>
                 </div>
 
-                <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02]">
-                  <p className="text-xs font-semibold tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+                  <p className="text-xs font-bold tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
                     <Cpu className="w-3.5 h-3.5" /> SESSION
                   </p>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-400">API calls used</span>
-                    <span className="text-white font-semibold">{report.api_calls_used}/3</span>
+                    <span className="text-slate-500">API calls used</span>
+                    <span className="text-slate-800 font-bold">{report.api_calls_used}/3</span>
                   </div>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Strengths and Weaknesses */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
             className="space-y-6"
           >
-            <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              <Target className="w-5 h-5 text-violet-400" /> Performance Breakdown
+            <h2 className="text-2xl font-extrabold tracking-tight flex items-center gap-2 text-slate-800">
+              <Target className="w-5 h-5 text-blue-500" /> Performance Breakdown
             </h2>
 
             <div className="grid md:grid-cols-2 gap-5">
-              {/* Strengths */}
-              <div className="card p-6 border-emerald-400/15">
-                <h3 className="text-lg font-semibold text-emerald-300 mb-4 flex items-center gap-2">
+              <div className="card p-6 border-emerald-200">
+                <h3 className="text-lg font-bold text-emerald-700 mb-4 flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5" /> Key Strengths
                 </h3>
                 <ul className="space-y-3">
                   {report.strengths.length === 0 ? (
-                    <li className="text-sm text-slate-500">No strengths recorded.</li>
+                    <li className="text-sm text-slate-400">No strengths recorded.</li>
                   ) : (
                     report.strengths.map((strength: string, idx: number) => (
                       <motion.li
@@ -305,9 +301,9 @@ function ReportPageContent() {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 + idx * 0.08 }}
-                        className="flex items-start gap-3 text-slate-300"
+                        className="flex items-start gap-3 text-slate-700"
                       >
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
                         <span className="text-sm">{strength}</span>
                       </motion.li>
                     ))
@@ -315,14 +311,13 @@ function ReportPageContent() {
                 </ul>
               </div>
 
-              {/* Weaknesses */}
-              <div className="card p-6 border-amber-400/15">
-                <h3 className="text-lg font-semibold text-amber-300 mb-4 flex items-center gap-2">
+              <div className="card p-6 border-amber-200">
+                <h3 className="text-lg font-bold text-amber-700 mb-4 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5" /> Areas for Improvement
                 </h3>
                 <ul className="space-y-3">
                   {report.weaknesses.length === 0 ? (
-                    <li className="text-sm text-slate-500">No weaknesses recorded.</li>
+                    <li className="text-sm text-slate-400">No weaknesses recorded.</li>
                   ) : (
                     report.weaknesses.map((weakness: string, idx: number) => (
                       <motion.li
@@ -330,9 +325,9 @@ function ReportPageContent() {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 + idx * 0.08 }}
-                        className="flex items-start gap-3 text-slate-300"
+                        className="flex items-start gap-3 text-slate-700"
                       >
-                        <span className="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 flex-shrink-0" />
                         <span className="text-sm">{weakness}</span>
                       </motion.li>
                     ))
@@ -342,7 +337,6 @@ function ReportPageContent() {
             </div>
           </motion.div>
 
-          {/* Action Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -354,7 +348,7 @@ function ReportPageContent() {
             </button>
             <button onClick={handleShareReport} className="btn btn-secondary btn-md">
               {shareState === 'copied' ? (
-                <Check className="w-4 h-4 text-emerald-400" />
+                <Check className="w-4 h-4 text-emerald-500" />
               ) : (
                 <Share2 className="w-4 h-4" />
               )}

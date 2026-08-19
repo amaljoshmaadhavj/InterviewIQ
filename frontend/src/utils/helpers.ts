@@ -23,13 +23,13 @@ export function formatDate(date: Date): string {
 }
 
 /**
- * Format score with color coding
+ * Format score with color coding (light theme — 4.5:1+ on white)
  */
 export function getScoreColor(score: number): string {
-  if (score >= 8) return 'text-emerald-400';
-  if (score >= 6) return 'text-violet-400';
-  if (score >= 4) return 'text-amber-400';
-  return 'text-red-400';
+  if (score >= 8) return 'text-emerald-600';
+  if (score >= 6) return 'text-blue-600';
+  if (score >= 4) return 'text-amber-500';
+  return 'text-rose-500';
 }
 
 /**
@@ -37,19 +37,19 @@ export function getScoreColor(score: number): string {
  */
 export function getScoreBarColor(score: number): string {
   if (score >= 8) return 'from-emerald-400 to-teal-400';
-  if (score >= 6) return 'from-violet-400 to-indigo-400';
+  if (score >= 6) return 'from-blue-400 to-cyan-400';
   if (score >= 4) return 'from-amber-400 to-orange-400';
-  return 'from-red-400 to-rose-400';
+  return 'from-rose-400 to-red-400';
 }
 
 /**
  * Get recommendation color
  */
 export function getRecommendationColor(recommendation: string): string {
-  if (recommendation.includes('STRONG')) return 'bg-emerald-400/10 border-emerald-400';
-  if (recommendation.includes('HIRE')) return 'bg-violet-400/10 border-violet-400';
-  if (recommendation.includes('MAYBE')) return 'bg-amber-400/10 border-amber-400';
-  return 'bg-red-400/10 border-red-400';
+  if (recommendation.includes('STRONG')) return 'bg-emerald-50 border-emerald-300';
+  if (recommendation.includes('HIRE')) return 'bg-blue-50 border-blue-300';
+  if (recommendation.includes('MAYBE')) return 'bg-amber-50 border-amber-300';
+  return 'bg-rose-50 border-rose-300';
 }
 
 /**

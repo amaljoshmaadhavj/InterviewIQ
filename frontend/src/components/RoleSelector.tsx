@@ -9,14 +9,14 @@ import { useApp } from '@/context/AppContext';
 import { cn } from '@/utils/cn';
 
 const ROLES = [
-  { title: 'Frontend Engineer', icon: Palette, gradient: 'from-violet-500 to-indigo-500' },
-  { title: 'Backend Engineer', icon: Server, gradient: 'from-sky-500 to-cyan-500' },
-  { title: 'Full Stack Developer', icon: Layers, gradient: 'from-indigo-500 to-violet-500' },
-  { title: 'Data Scientist', icon: BarChart3, gradient: 'from-orange-500 to-amber-500' },
-  { title: 'DevOps Engineer', icon: Rocket, gradient: 'from-emerald-500 to-teal-500' },
-  { title: 'AI/ML Engineer', icon: BrainCircuit, gradient: 'from-fuchsia-500 to-purple-500' },
-  { title: 'Senior Backend Engineer', icon: ServerCog, gradient: 'from-amber-500 to-orange-500' },
-  { title: 'Product Manager', icon: Compass, gradient: 'from-rose-500 to-pink-500' },
+  { title: 'Frontend Engineer', icon: Palette, gradient: 'from-blue-500 to-cyan-500' },
+  { title: 'Backend Engineer', icon: Server, gradient: 'from-sky-500 to-blue-500' },
+  { title: 'Full Stack Developer', icon: Layers, gradient: 'from-cyan-500 to-teal-500' },
+  { title: 'Data Scientist', icon: BarChart3, gradient: 'from-violet-500 to-blue-500' },
+  { title: 'DevOps Engineer', icon: Rocket, gradient: 'from-teal-400 to-cyan-500' },
+  { title: 'AI/ML Engineer', icon: BrainCircuit, gradient: 'from-blue-500 to-indigo-500' },
+  { title: 'Senior Backend Engineer', icon: ServerCog, gradient: 'from-sky-500 to-cyan-400' },
+  { title: 'Product Manager', icon: Compass, gradient: 'from-indigo-400 to-blue-500' },
 ];
 
 interface RoleSelectorProps {
@@ -46,14 +46,12 @@ export function RoleSelector({ onRoleSelected }: RoleSelectorProps) {
         resume_data: state.resumeData,
       });
 
-      // Store session data
       setSessionId(response.session_id);
       setSelectedRole(selectedRole);
       setCurrentQuestion(response.first_question);
 
       onRoleSelected?.(selectedRole);
 
-      // Redirect to interview
       setTimeout(() => {
         setLoading(false);
         router.push('/interview');
@@ -75,13 +73,13 @@ export function RoleSelector({ onRoleSelected }: RoleSelectorProps) {
           animate={{ opacity: 1, y: 0 }}
           className="mb-10 text-center"
         >
-          <span className="chip bg-violet-500/10 text-violet-300 border border-violet-400/25 mb-5">
+          <span className="chip bg-blue-100 text-blue-700 border border-blue-200 mb-5">
             <BrainCircuit className="w-3.5 h-3.5" /> Step 2 of 2
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-3">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-3">
             Select your target <span className="gradient-text">role</span>
           </h1>
-          <p className="text-slate-400 text-lg">
+          <p className="text-slate-500 text-lg">
             Choose the position you&apos;re interviewing for — we&apos;ll tailor questions to match.
           </p>
         </motion.div>
@@ -100,18 +98,17 @@ export function RoleSelector({ onRoleSelected }: RoleSelectorProps) {
                 onClick={() => setSelected(role.title)}
                 aria-pressed={isSelected}
                 className={cn(
-                  'focus-ring relative overflow-hidden rounded-xl border-2 transition-all duration-300 text-left group',
+                  'focus-ring relative overflow-hidden rounded-2xl border-2 transition-all duration-300 text-left group',
                   isSelected
-                    ? 'border-violet-400 bg-violet-500/10 shadow-lg shadow-violet-500/15'
-                    : 'border-slate-700/70 bg-slate-900/50 hover:border-violet-400/40 hover:bg-slate-900/80 hover:-translate-y-0.5'
+                    ? 'border-blue-400 bg-blue-50 shadow-card'
+                    : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/30 hover:shadow-soft hover:-translate-y-0.5'
                 )}
               >
-                {/* Gradient wash */}
                 <div
                   className={cn(
-                    'absolute inset-0 rounded-xl bg-gradient-to-br transition-opacity duration-300 pointer-events-none',
+                    'absolute inset-0 rounded-2xl bg-gradient-to-br transition-opacity duration-300 pointer-events-none',
                     role.gradient,
-                    isSelected ? 'opacity-10' : 'opacity-0 group-hover:opacity-[0.05]'
+                    isSelected ? 'opacity-10' : 'opacity-0 group-hover:opacity-[0.06]'
                   )}
                 />
 
@@ -121,7 +118,7 @@ export function RoleSelector({ onRoleSelected }: RoleSelectorProps) {
                       className={cn(
                         'p-2.5 rounded-xl bg-gradient-to-br border transition-transform duration-300 group-hover:scale-105',
                         role.gradient,
-                        'border-white/10'
+                        'border-white/50 shadow-float'
                       )}
                     >
                       <Icon className="w-5 h-5 text-white" />
@@ -130,14 +127,14 @@ export function RoleSelector({ onRoleSelected }: RoleSelectorProps) {
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="p-1.5 rounded-full bg-violet-400 text-slate-950"
+                        className="p-1.5 rounded-full bg-blue-500 text-white shadow-float"
                       >
                         <Check className="w-3.5 h-3.5" strokeWidth={3} />
                       </motion.div>
                     )}
                   </div>
-                  <h3 className="text-white font-semibold text-sm leading-snug">{role.title}</h3>
-                  {isSelected && <p className="text-xs text-violet-300 mt-1 font-medium">Selected</p>}
+                  <h3 className="text-slate-800 font-bold text-sm leading-snug">{role.title}</h3>
+                  {isSelected && <p className="text-xs text-blue-600 mt-1 font-semibold">Selected</p>}
                 </div>
               </motion.button>
             );
@@ -149,14 +146,14 @@ export function RoleSelector({ onRoleSelected }: RoleSelectorProps) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-8 p-4 bg-sky-500/5 border border-sky-400/20 rounded-xl flex items-center gap-3"
+            className="mb-8 p-4 bg-cyan-50 border border-cyan-200 rounded-2xl flex items-center gap-3"
           >
-            <Info className="w-4 h-4 text-sky-300 flex-shrink-0" />
-            <p className="text-sky-200 text-sm">
+            <Info className="w-4 h-4 text-cyan-600 flex-shrink-0" />
+            <p className="text-cyan-700 text-sm">
               Interviewing as{' '}
-              <span className="font-semibold capitalize text-sky-100">{state.resumeData.experience_level}</span>{' '}
+              <span className="font-bold capitalize text-cyan-800">{state.resumeData.experience_level}</span>{' '}
               level ·{' '}
-              <span className="font-semibold text-sky-100">{state.resumeData.skills.length}</span> skills
+              <span className="font-bold text-cyan-800">{state.resumeData.skills.length}</span> skills
               detected
             </p>
           </motion.div>
@@ -190,24 +187,24 @@ export function RoleSelector({ onRoleSelected }: RoleSelectorProps) {
           transition={{ delay: 0.5 }}
           className="mt-12 max-w-2xl mx-auto p-6 card"
         >
-          <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-            <Info className="w-4 h-4 text-violet-400" /> How it works
+          <h3 className="text-slate-800 font-bold mb-4 flex items-center gap-2">
+            <Info className="w-4 h-4 text-blue-500" /> How it works
           </h3>
-          <ul className="text-slate-400 text-sm space-y-2.5">
+          <ul className="text-slate-600 text-sm space-y-2.5">
             <li className="flex gap-2.5">
-              <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-              We&apos;ll ask <span className="text-violet-300">5 adaptive questions</span> based on your role and resume
+              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+              We&apos;ll ask <span className="text-blue-600 font-semibold">5 adaptive questions</span> based on your role and resume
             </li>
             <li className="flex gap-2.5">
-              <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
               Answer conversationally — there are no &quot;trick&quot; questions
             </li>
             <li className="flex gap-2.5">
-              <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-              Get <span className="text-violet-300">detailed feedback</span> on each answer (0–10 score)
+              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+              Get <span className="text-blue-600 font-semibold">detailed feedback</span> on each answer (0–10 score)
             </li>
             <li className="flex gap-2.5">
-              <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
               Interview takes ~5–10 minutes after the initial setup
             </li>
           </ul>
