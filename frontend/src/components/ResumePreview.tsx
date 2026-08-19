@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FileText, RefreshCw, X } from 'lucide-react';
+import { FileText, RefreshCw, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/utils/cn';
@@ -37,40 +37,40 @@ export function ResumePreview({ sectionsFound, fileName }: ResumePreviewProps) {
         {items.map((item, idx) => (
           <span
             key={idx}
-            className="px-3 py-1 rounded-full text-xs bg-cyan-400/10 border border-cyan-400/30 text-cyan-300"
+            className="chip bg-violet-500/10 text-violet-200 border border-violet-400/25"
           >
             {item}
           </span>
         ))}
       </div>
     ) : (
-      <p className="text-sm text-gray-500">{empty}</p>
+      <p className="text-sm text-slate-500">{empty}</p>
     );
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-8 bg-gray-900/60 border border-gray-700 rounded-xl overflow-hidden"
+      className="card mb-8 overflow-hidden"
     >
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 p-4 border-b border-gray-700 bg-gray-800/40">
+      <div className="flex items-center justify-between gap-4 p-4 border-b border-white/5 bg-white/[0.02]">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="p-2 rounded-lg bg-cyan-400/10 border border-cyan-400/30 flex-shrink-0">
-            <FileText className="w-5 h-5 text-cyan-400" />
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 border border-violet-400/30 flex-shrink-0">
+            <FileText className="w-5 h-5 text-violet-300" />
           </div>
           <div className="min-w-0">
             <p className="text-white font-semibold truncate">{fileName || 'Resume'}</p>
-            <p className="text-xs text-gray-400">
-              <span className="capitalize">{resume.experience_level}</span> level candidate
+            <p className="text-xs text-slate-400">
+              <span className="capitalize text-violet-300">{resume.experience_level}</span> level candidate
             </p>
           </div>
         </div>
         <button
           onClick={handleChangeResume}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-300 hover:text-white bg-gray-700/50 hover:bg-gray-600/50 transition-all flex-shrink-0"
+          className="btn btn-secondary btn-sm focus-ring flex-shrink-0"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-3.5 h-3.5" />
           Change Resume
         </button>
       </div>
@@ -79,39 +79,39 @@ export function ResumePreview({ sectionsFound, fileName }: ResumePreviewProps) {
       <div className="p-5 space-y-5">
         {resume.summary && (
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-2">SUMMARY</p>
-            <p className="text-sm text-gray-300 leading-relaxed">{resume.summary}</p>
+            <p className="text-xs font-semibold tracking-wider text-slate-500 mb-2">SUMMARY</p>
+            <p className="text-sm text-slate-300 leading-relaxed">{resume.summary}</p>
           </div>
         )}
 
         <div>
-          <p className="text-xs font-medium text-gray-400 mb-2">SKILLS</p>
+          <p className="text-xs font-semibold tracking-wider text-slate-500 mb-2">SKILLS</p>
           {chips(resume.skills, 'No skills detected')}
         </div>
 
         {resume.domains && resume.domains.length > 0 && (
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-2">DOMAINS</p>
+            <p className="text-xs font-semibold tracking-wider text-slate-500 mb-2">DOMAINS</p>
             {chips(resume.domains, '')}
           </div>
         )}
 
         {resume.projects && resume.projects.length > 0 && (
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-2">PROJECTS</p>
+            <p className="text-xs font-semibold tracking-wider text-slate-500 mb-2">PROJECTS</p>
             {chips(resume.projects, 'No projects detected')}
           </div>
         )}
 
         {sectionsFound && sectionsFound.length > 0 && (
           <div>
-            <p className="text-xs font-medium text-gray-400 mb-2">SECTIONS FOUND</p>
+            <p className="text-xs font-semibold tracking-wider text-slate-500 mb-2">SECTIONS FOUND</p>
             <div className="flex flex-wrap gap-2">
               {sectionsFound.map((section, idx) => (
                 <span
                   key={idx}
                   className={cn(
-                    'px-2.5 py-1 rounded-md text-xs bg-gray-700/50 border border-gray-600 text-gray-300'
+                    'px-2.5 py-1 rounded-md text-xs bg-slate-800 border border-slate-700 text-slate-300'
                   )}
                 >
                   {section}
@@ -122,9 +122,9 @@ export function ResumePreview({ sectionsFound, fileName }: ResumePreviewProps) {
         )}
       </div>
 
-      <div className="p-3 bg-gray-800/30 border-t border-gray-700 flex items-center gap-2 text-xs text-gray-500">
-        <X className="w-3.5 h-3.5" />
-        This is what the AI extracted. If anything looks wrong, click "Change Resume".
+      <div className="p-3 bg-white/[0.02] border-t border-white/5 flex items-center gap-2 text-xs text-slate-500">
+        <Info className="w-3.5 h-3.5 flex-shrink-0" />
+        This is what the AI extracted. If anything looks wrong, click &quot;Change Resume&quot;.
       </div>
     </motion.div>
   );

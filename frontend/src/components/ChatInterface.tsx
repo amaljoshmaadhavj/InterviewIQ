@@ -1,13 +1,8 @@
-/**
- * Interview Chat Interface
- * ChatGPT-like interface for the interview with auto-scrolling and animation
- */
-
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Send, AlertCircle, Loader, SkipForward, RotateCcw } from 'lucide-react';
+import { Send, AlertCircle, Loader2, SkipForward, RotateCcw, BrainCircuit, MessageSquare, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api';
@@ -17,6 +12,24 @@ import { getScoreColor } from '@/utils/helpers';
 import type { ChatMessage } from '@/utils/types';
 
 const SKIP_MARKER = '__SKIP_QUESTION__';
+const MAX_QUESTIONS = 5;
+
+function ScoreBadge({ score }: { score: number }) {
+  return (
+    <div
+      className={cn(
+        'relative w-14 h-14 rounded-full flex items-center justify-center shrink-0',
+        'border-2'
+      )}
+      style={{
+        borderColor: score >= 8 ? 'rgba(52,211,153,0.6)' : score >= 6 ? 'rgba(139,92,246,0.6)' : score >= 4 ? 'rgba(251,191,36,0.6)' : 'rgba(248,113,113,0.6)',
+      }}
+    >
+      <span className={cn('text-lg font-bold', getScoreColor(score))}>{score}</span>
+      <span className="absolute -bottom-4 text-[10px] text-slate-500 font-medium">/10</span>
+    </div>
+  );
+}
 
 export function ChatInterface() {
   const router = useRouter();
@@ -42,7 +55,7 @@ export function ChatInterface() {
         id: isSkip ? `skip-${Date.now()}` : `user-${Date.now()}`,
         type: 'answer',
         sender: 'candidate',
-        content: isSkip ? '⏭ (Skipped this question)' : answer,
+        content: isSkip ? 'Skipped this question' : answer,
         timestamp: new Date(),
       };
       addChatMessage(userMessage);
@@ -138,14 +151,20 @@ export function ChatInterface() {
 
   if (!state.sessionId) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <p className="text-white mb-6">No active interview session</p>
-          <Link href="/" className="px-6 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600">
+      <div className="min-h-screen pt-32 flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card max-w-md w-full p-8 text-center"
+        >
+          <div className="p-3 rounded-2xl bg-red-500/10 border border-red-400/25 w-fit mx-auto mb-5">
+            <AlertCircle className="w-8 h-8 text-red-400" />
+          </div>
+          <p className="text-white font-semibold mb-6">No active interview session</p>
+          <Link href="/" className="btn btn-primary btn-md">
             Start Interview
           </Link>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -157,29 +176,46 @@ export function ChatInterface() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-4 pb-4 border-b border-gray-700"
+          className="mb-5 pb-4 border-b border-white/5"
         >
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-white">{state.selectedRole}</h1>
-              <p className="text-gray-400 text-sm">
-                Question {questionNumber} of 5
-              </p>
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 shrink-0">
+                <BrainCircuit className="w-5 h-5 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold text-white truncate">{state.selectedRole}</h1>
+                <p className="text-slate-400 text-sm flex items-center gap-1.5">
+                  Question {Math.min(questionNumber, MAX_QUESTIONS)} of {MAX_QUESTIONS}
+                </p>
+              </div>
             </div>
-            {isInterviewComplete && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="px-4 py-2 bg-green-400/10 border border-green-400/30 rounded-lg"
-              >
-                <p className="text-green-400 font-semibold text-sm">Interview Complete ✓</p>
-              </motion.div>
-            )}
+
+            {/* Progress bar */}
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex w-28 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <motion.div
+                  animate={{ width: `${(Math.min(questionNumber, MAX_QUESTIONS) / MAX_QUESTIONS) * 100}%` }}
+                  transition={{ duration: 0.5 }}
+                  className="h-full bg-gradient-to-r from-violet-400 to-cyan-400 rounded-full"
+                />
+              </div>
+              {isInterviewComplete && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="px-3.5 py-1.5 bg-emerald-500/10 border border-emerald-400/30 rounded-full flex items-center gap-1.5"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-emerald-300 text-sm font-semibold">Complete</span>
+                </motion.div>
+              )}
+            </div>
           </div>
         </motion.div>
 
         {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto space-y-4 mb-6">
+        <div className="flex-1 overflow-y-auto space-y-5 mb-6 pr-1">
           {state.chatHistory.length === 0 ? (
             // First Question
             <motion.div
@@ -187,8 +223,13 @@ export function ChatInterface() {
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-start"
             >
-              <div className="max-w-md bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-white text-sm leading-relaxed">{state.currentQuestion}</p>
+              <div className="flex items-start gap-3 max-w-[85%]">
+                <div className="p-2 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 shrink-0 mt-1">
+                  <BrainCircuit className="w-4 h-4 text-white" />
+                </div>
+                <div className="card px-5 py-4 rounded-2xl rounded-tl-sm">
+                  <p className="text-sm text-slate-200 leading-relaxed">{state.currentQuestion}</p>
+                </div>
               </div>
             </motion.div>
           ) : (
@@ -197,70 +238,104 @@ export function ChatInterface() {
                 key={message.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
+                transition={{ delay: idx * 0.03 }}
                 className={cn('flex', message.sender === 'candidate' ? 'justify-end' : 'justify-start')}
               >
                 {message.sender === 'candidate' ? (
                   // User Message
-                  <div className="max-w-xl bg-cyan-600/20 border border-cyan-500/30 rounded-lg p-4">
-                    <p className="text-white text-sm leading-relaxed">{message.content}</p>
+                  <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-violet-500/20 to-indigo-500/25 border border-violet-400/20 px-5 py-3.5">
+                    <p className="text-sm text-slate-100 leading-relaxed">{message.content}</p>
                   </div>
                 ) : message.type === 'evaluation' ? (
                   // Evaluation Message (Feedback)
-                  <div className="max-w-xl w-full space-y-2">
-                    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <span className="text-gray-400 text-xs font-medium">FEEDBACK</span>
-                        <span className={cn('text-lg font-bold', getScoreColor(message.evaluation?.score || 0))}>
-                          {message.evaluation?.score}/10
-                        </span>
+                  <div className="max-w-full w-full space-y-2">
+                    <div className="card p-5 border-emerald-400/15">
+                      <div className="flex items-start gap-4 mb-4">
+                        <ScoreBadge score={message.evaluation?.score || 0} />
+                        <div className="flex-1 pt-0.5">
+                          <p className="text-xs font-semibold tracking-wider text-slate-500 mb-1.5">FEEDBACK</p>
+                          <p className="text-sm text-slate-200 leading-relaxed">{message.evaluation?.feedback}</p>
+                        </div>
                       </div>
-                      <p className="text-white text-sm mb-3">{message.evaluation?.feedback}</p>
 
                       {message.evaluation && (
-                        <div className="grid grid-cols-3 gap-2 text-xs mb-3">
-                          <div className="bg-white/5 rounded p-2">
-                            <p className="text-gray-400">Clarity</p>
-                            <p className="text-cyan-400 font-bold">{message.evaluation.clarity}/5</p>
-                          </div>
-                          <div className="bg-white/5 rounded p-2">
-                            <p className="text-gray-400">Depth</p>
-                            <p className="text-cyan-400 font-bold">{message.evaluation.depth}/5</p>
-                          </div>
-                          <div className="bg-white/5 rounded p-2">
-                            <p className="text-gray-400">Relevance</p>
-                            <p className="text-cyan-400 font-bold">{message.evaluation.relevance}/5</p>
-                          </div>
+                        <div className="grid grid-cols-3 gap-3 mb-4">
+                          {[
+                            { label: 'Clarity', value: message.evaluation.clarity, max: 5 },
+                            { label: 'Depth', value: message.evaluation.depth, max: 5 },
+                            { label: 'Relevance', value: message.evaluation.relevance, max: 5 },
+                          ].map((item) => (
+                            <div key={item.label} className="bg-white/[0.03] border border-white/5 rounded-lg p-3 text-center">
+                              <p className="text-xs text-slate-500 mb-1.5">{item.label}</p>
+                              <p className="text-base font-bold text-slate-100">
+                                {item.value}
+                                <span className="text-xs text-slate-500 font-medium">/{item.max}</span>
+                              </p>
+                              <div className="mt-2 h-1 bg-slate-800 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-violet-400 to-cyan-400 rounded-full"
+                                  style={{ width: `${((item.value || 0) / item.max) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
 
-                      {message.evaluation?.strengths && (
-                        <div className="mb-2">
-                          <p className="text-green-400 text-xs font-medium mb-1">✓ Strengths</p>
-                          <ul className="text-gray-300 text-xs space-y-1">
-                            {message.evaluation.strengths.map((s, i) => (
-                              <li key={i}>• {s}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        {message.evaluation?.strengths && message.evaluation.strengths.length > 0 && (
+                          <div className="bg-emerald-500/5 border border-emerald-400/20 rounded-lg p-3.5">
+                            <p className="text-emerald-300 text-xs font-semibold mb-2 flex items-center gap-1.5">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Strengths
+                            </p>
+                            <ul className="text-slate-300 text-xs space-y-1.5">
+                              {message.evaluation.strengths.map((s, i) => (
+                                <li key={i} className="flex gap-1.5">
+                                  <span className="w-1 h-1 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
+                                  {s}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
 
-                      {message.evaluation?.weaknesses && (
-                        <div>
-                          <p className="text-orange-400 text-xs font-medium mb-1">⚠ Areas to Improve</p>
-                          <ul className="text-gray-300 text-xs space-y-1">
-                            {message.evaluation.weaknesses.map((w, i) => (
-                              <li key={i}>• {w}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                        {message.evaluation?.weaknesses && message.evaluation.weaknesses.length > 0 && (
+                          <div className="bg-amber-500/5 border border-amber-400/20 rounded-lg p-3.5">
+                            <p className="text-amber-300 text-xs font-semibold mb-2 flex items-center gap-1.5">
+                              <AlertCircle className="w-3.5 h-3.5" /> Areas to Improve
+                            </p>
+                            <ul className="text-slate-300 text-xs space-y-1.5">
+                              {message.evaluation.weaknesses.map((w, i) => (
+                                <li key={i} className="flex gap-1.5">
+                                  <span className="w-1 h-1 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                                  {w}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : message.content.startsWith('Error:') ? (
+                  // Error Message
+                  <div className="flex items-start gap-3 max-w-[85%]">
+                    <div className="p-2 rounded-full bg-red-500/15 border border-red-400/25 shrink-0 mt-1">
+                      <AlertCircle className="w-4 h-4 text-red-400" />
+                    </div>
+                    <div className="card px-5 py-4 rounded-2xl rounded-tl-sm border-red-400/20 bg-red-500/5">
+                      <p className="text-sm text-red-300 leading-relaxed">{message.content}</p>
                     </div>
                   </div>
                 ) : (
                   // Question Message
-                  <div className="max-w-xl bg-gray-800 rounded-lg p-4 border border-gray-700">
-                    <p className="text-white text-sm leading-relaxed">{message.content}</p>
+                  <div className="flex items-start gap-3 max-w-[85%]">
+                    <div className="p-2 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 shrink-0 mt-1">
+                      <BrainCircuit className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="card px-5 py-4 rounded-2xl rounded-tl-sm">
+                      <p className="text-sm text-slate-200 leading-relaxed">{message.content}</p>
+                    </div>
                   </div>
                 )}
               </motion.div>
@@ -280,13 +355,13 @@ export function ChatInterface() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between gap-3 p-3 bg-orange-400/10 border border-orange-400/30 rounded-lg"
+                className="flex items-center justify-between gap-3 p-3 bg-amber-500/10 border border-amber-400/30 rounded-xl"
               >
-                <p className="text-orange-300 text-sm">Your last answer failed to send.</p>
+                <p className="text-amber-200 text-sm">Your last answer failed to send.</p>
                 <button
                   onClick={handleRetryAnswer}
                   disabled={isSubmitting}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 flex-shrink-0"
+                  className="btn btn-md bg-amber-500 text-slate-950 hover:bg-amber-400 flex-shrink-0"
                 >
                   <RotateCcw className="w-4 h-4" />
                   Retry
@@ -294,40 +369,29 @@ export function ChatInterface() {
               </motion.div>
             )}
 
-            <div className="flex gap-2">
+            <div className="card flex items-end gap-2 p-2.5">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 disabled={isSubmitting}
-                placeholder="Type your response... (Shift+Enter for new line)"
-                className={cn(
-                  'flex-1 p-4 rounded-lg bg-gray-900 border border-gray-700',
-                  'text-white placeholder-gray-500',
-                  'focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500',
-                  'resize-none',
-                  'disabled:opacity-50'
-                )}
+                placeholder="Type your response… (Shift+Enter for new line)"
+                className="flex-1 bg-transparent border-0 focus:ring-0 focus:outline-none resize-none px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 disabled:opacity-50"
                 rows={3}
               />
               <button
                 onClick={handleSubmitAnswer}
                 disabled={!input.trim() || isSubmitting}
+                aria-label="Send answer"
                 className={cn(
-                  'p-4 rounded-lg transition-all duration-200',
-                  'flex items-center justify-center',
+                  'btn p-3.5 rounded-lg shrink-0',
                   input.trim() && !isSubmitting
-                    ? 'bg-cyan-500 text-white hover:bg-cyan-600 cursor-pointer'
-                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    ? 'btn-primary'
+                    : 'bg-slate-800 text-slate-500'
                 )}
               >
                 {isSubmitting ? (
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  >
-                    <Loader className="w-5 h-5" />
-                  </motion.div>
+                  <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
                   <Send className="w-5 h-5" />
                 )}
@@ -335,21 +399,19 @@ export function ChatInterface() {
             </div>
 
             {/* Skip Question */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-1">
               <button
                 onClick={handleSkipQuestion}
                 disabled={isSubmitting}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200',
-                  isSubmitting
-                    ? 'text-gray-600 cursor-not-allowed'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  'btn btn-sm',
+                  isSubmitting ? 'text-slate-600' : 'text-slate-400 hover:text-white'
                 )}
               >
                 <SkipForward className="w-4 h-4" />
                 Skip Question
               </button>
-              <p className="text-xs text-gray-500">Skipping counts as a low score for that question</p>
+              <p className="text-xs text-slate-500">Skipping scores low for that question</p>
             </div>
           </motion.div>
         ) : (
@@ -360,14 +422,11 @@ export function ChatInterface() {
           >
             <Link
               href={`/interview/report?session=${state.sessionId}`}
-              className="px-8 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 font-semibold text-center"
+              className="btn btn-primary btn-lg"
             >
-              View Report
+              <MessageSquare className="w-4 h-4" /> View Report
             </Link>
-            <button
-              onClick={handleNewInterview}
-              className="px-8 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 font-semibold text-center"
-            >
+            <button onClick={handleNewInterview} className="btn btn-secondary btn-lg">
               Start New Interview
             </button>
           </motion.div>

@@ -18,7 +18,7 @@ export default function RoleSelectionPage() {
   }, [state.resumeData, router]);
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <div className="min-h-screen pt-24 pb-16">
       <div className="max-w-6xl mx-auto px-4">
         <ResumePreview fileName={state.fileName} sectionsFound={state.sectionsFound} />
       </div>

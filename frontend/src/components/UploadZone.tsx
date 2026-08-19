@@ -1,13 +1,8 @@
-/**
- * Upload Zone Component - Drag & Drop Resume Upload
- * Shows progress bar with "Neural Analyzing..." animation while Gemini processes
- */
-
 'use client';
 
 import React, { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, AlertCircle, CheckCircle } from 'lucide-react';
+import { UploadCloud, AlertCircle, CheckCircle2, FileText, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import { useApp } from '@/context/AppContext';
@@ -25,6 +20,7 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [fileName, setLocalFileName] = useState<string | null>(null);
 
   const handleFile = useCallback(
     async (file: File) => {
@@ -41,6 +37,7 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
       }
 
       setUploadError(null);
+      setLocalFileName(file.name);
       setIsUploading(true);
       setLoading(true);
       setUploadProgress(0);
@@ -123,64 +120,80 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         animate={{
-          borderColor: isDragging ? '#0EA5E9' : '#334155',
-          backgroundColor: isDragging ? 'rgba(14, 165, 233, 0.05)' : 'rgba(15, 23, 42, 0.4)',
+          borderColor: isDragging ? 'rgba(167,139,250,0.7)' : 'rgba(148,163,184,0.16)',
+          backgroundColor: isDragging ? 'rgba(139,92,246,0.06)' : 'rgba(16,24,40,0.5)',
         }}
+        transition={{ duration: 0.2 }}
         className={cn(
-          'relative rounded-2xl border-2 border-dashed transition-all cursor-pointer',
-          'p-8 md:p-12 text-center',
-          'hover:border-cyan-400 hover:bg-cyan-400/5'
+          'relative rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer',
+          'p-10 md:p-14 text-center overflow-hidden',
+          'hover:border-violet-400/40 hover:bg-slate-900/60'
         )}
       >
+        {/* Ambient glow */}
+        <div
+          className={cn(
+            'absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-40 rounded-full blur-3xl transition-opacity duration-500 pointer-events-none',
+            isDragging ? 'opacity-40 bg-violet-500/40' : 'opacity-10 bg-violet-500'
+          )}
+        />
+
         {!isUploading ? (
           <>
-            {/* Upload Icon */}
-            <motion.div
-              animate={{ y: [0, -5, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="flex justify-center mb-4"
-            >
-              <div className="p-4 rounded-full bg-cyan-400/10 border border-cyan-400/30">
-                <Upload className="w-8 h-8 text-cyan-400" />
-              </div>
-            </motion.div>
+            <div className="relative">
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="flex justify-center mb-5"
+              >
+                <div className="relative p-4 rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 border border-violet-400/30">
+                  <UploadCloud className="w-8 h-8 text-violet-300" />
+                  <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
+                </div>
+              </motion.div>
 
-            {/* Text */}
-            <h3 className="text-xl font-semibold text-white mb-2">
-              Drop your resume here
-            </h3>
-            <p className="text-gray-400 mb-4">or click to browse</p>
-            <p className="text-sm text-gray-500">Supports PDF files up to 10MB</p>
+              <h3 className="text-xl font-semibold text-white mb-2">Drop your resume here</h3>
+              <p className="text-slate-400 mb-1">or click to browse</p>
+              <p className="text-sm text-slate-500 flex items-center justify-center gap-1.5">
+                <FileText className="w-3.5 h-3.5" />
+                PDF only · up to 10MB
+              </p>
 
-            {/* Hidden File Input */}
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handleFileInput}
-              disabled={isUploading}
-              className="absolute inset-0 opacity-0 cursor-pointer"
-            />
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileInput}
+                disabled={isUploading}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                aria-label="Upload resume PDF"
+              />
+            </div>
           </>
         ) : (
-          <div className="space-y-4">
-            {/* Loading Animation */}
-            <div className="flex justify-center mb-6">
+          <div className="relative space-y-5">
+            <div className="flex justify-center">
               <div className="relative w-16 h-16">
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                  className="absolute inset-0 rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400"
+                  transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }}
+                  className="absolute inset-0 rounded-full border-2 border-transparent border-t-violet-400 border-r-indigo-400"
                 />
                 <motion.div
                   animate={{ rotate: -360 }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                  className="absolute inset-2 rounded-full border-2 border-transparent border-b-blue-400"
+                  transition={{ duration: 2.4, repeat: Infinity, ease: 'linear' }}
+                  className="absolute inset-2.5 rounded-full border-2 border-transparent border-b-cyan-400 border-l-transparent"
                 />
               </div>
             </div>
 
-            <p className="text-white font-medium">Neural Analyzing...</p>
-            <p className="text-gray-400 text-sm">Processing your resume with AI</p>
+            <div>
+              <p className="text-white font-medium">Analyzing your resume…</p>
+              <p className="text-slate-400 text-sm mt-1">
+                <span className="inline-flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" /> {fileName}
+                </span>
+              </p>
+            </div>
           </div>
         )}
       </motion.div>
@@ -192,14 +205,20 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
           animate={{ opacity: 1, y: 0 }}
           className="mt-6 space-y-2"
         >
-          <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+          <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
             <motion.div
               animate={{ width: `${uploadProgress}%` }}
-              transition={{ duration: 0.5 }}
-              className="h-full bg-gradient-to-r from-cyan-400 to-blue-500"
+              transition={{ duration: 0.4 }}
+              className="h-full bg-gradient-to-r from-violet-400 via-indigo-400 to-cyan-400 rounded-full"
             />
           </div>
-          <p className="text-xs text-gray-400 text-center">{Math.round(uploadProgress)}%</p>
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span className="inline-flex items-center gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-400" />
+              Processing with AI
+            </span>
+            <span>{Math.round(uploadProgress)}%</span>
+          </div>
         </motion.div>
       )}
 
@@ -208,12 +227,13 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-3"
+          role="alert"
+          className="mt-4 p-4 bg-red-500/10 border border-red-400/30 rounded-xl flex items-start gap-3"
         >
           <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-red-400 font-medium">Upload Error</p>
-            <p className="text-red-400/80 text-sm">{uploadError}</p>
+            <p className="text-red-300 font-medium">Upload Error</p>
+            <p className="text-red-300/80 text-sm">{uploadError}</p>
           </div>
         </motion.div>
       )}
@@ -223,12 +243,13 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg flex items-start gap-3"
+          role="status"
+          className="mt-4 p-4 bg-emerald-500/10 border border-emerald-400/30 rounded-xl flex items-start gap-3"
         >
-          <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-green-400 font-medium">Resume Analyzed!</p>
-            <p className="text-green-400/80 text-sm">Redirecting to role selection...</p>
+            <p className="text-emerald-300 font-medium">Resume Analyzed!</p>
+            <p className="text-emerald-300/80 text-sm">Redirecting to role selection…</p>
           </div>
         </motion.div>
       )}
