@@ -1,7 +1,6 @@
 'use client';
 
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -9,54 +8,54 @@ import {
   AlertCircle,
   Download,
   Share2,
-  Home,
   Check,
+  RotateCcw,
   Sparkles,
-  Target,
-  Cpu,
 } from 'lucide-react';
 import { api } from '@/services/api';
 import { useNewInterview } from '@/hooks/useNewInterview';
-import { getScoreColor, getRecommendationColor } from '@/utils/helpers';
+import { getScoreColor } from '@/utils/helpers';
 import { cn } from '@/utils/cn';
 import type { InterviewReportResponse } from '@/utils/types';
 
 function ScoreRing({ score }: { score: number }) {
   const pct = Math.min(score / 10, 1);
-  const radius = 56;
+  const radius = 54;
   const circumference = 2 * Math.PI * radius;
 
   const color =
     score >= 8
-      ? 'stroke-emerald-400'
+      ? 'stroke-emerald-600'
       : score >= 6
-        ? 'stroke-blue-400'
+        ? 'stroke-blue-600'
         : score >= 4
-          ? 'stroke-amber-400'
-          : 'stroke-rose-400';
+          ? 'stroke-amber-600'
+          : 'stroke-rose-600';
 
   return (
-    <div className="relative w-40 h-40">
+    <div className="relative w-36 h-36 mx-auto">
       <svg className="w-full h-full -rotate-90" viewBox="0 0 128 128">
-        <circle cx="64" cy="64" r={radius} fill="none" strokeWidth="9" className="stroke-slate-100" />
-        <motion.circle
+        <circle cx="64" cy="64" r={radius} fill="none" strokeWidth="8" className="stroke-slate-100" />
+        <circle
           cx="64"
           cy="64"
           r={radius}
           fill="none"
-          strokeWidth="9"
+          strokeWidth="8"
           strokeLinecap="round"
           className={color}
-          initial={{ strokeDasharray: `${circumference} ${circumference}` }}
-          animate={{ strokeDasharray: `${circumference * pct} ${circumference}` }}
-          transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
+          style={{
+            strokeDasharray: circumference,
+            strokeDashoffset: circumference * (1 - pct),
+            transition: 'stroke-dashoffset 1s ease-out',
+          }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={cn('text-4xl font-extrabold tracking-tight', getScoreColor(score))}>
+        <span className={cn('text-3xl font-extrabold tracking-tight', getScoreColor(score))}>
           {score}
         </span>
-        <span className="text-xs text-slate-400 font-semibold">/10</span>
+        <span className="text-[11px] text-slate-400 font-semibold">OUT OF 10</span>
       </div>
     </div>
   );
@@ -67,11 +66,7 @@ export default function ReportPage() {
     <Suspense
       fallback={
         <div className="min-h-screen pt-24 flex items-center justify-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-12 h-12 border-2 border-blue-200 border-t-blue-500 rounded-full"
-          />
+          <div className="w-10 h-10 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin" />
         </div>
       }
     >
@@ -113,13 +108,13 @@ function ReportPageContent() {
 
   const buildReportText = useCallback((r: InterviewReportResponse): string => {
     const lines = [
-      'InterviewIQ - Interview Report',
-      '==============================',
+      'InterviewIQ - Candidate Technical Evaluation',
+      '==========================================',
       '',
       `Role: ${r.role}`,
       `Overall Score: ${Math.round(r.average_score)}/10`,
       `Recommendation: ${r.recommendation}`,
-      `API Calls Used: ${r.api_calls_used}`,
+      `Completed Questions: 5`,
       '',
       'Key Strengths:',
       ...r.strengths.map((s) => `- ${s}`),
@@ -127,7 +122,7 @@ function ReportPageContent() {
       'Areas for Improvement:',
       ...r.weaknesses.map((w) => `- ${w}`),
       '',
-      `View online: ${window.location.href}`,
+      `View session online: ${window.location.href}`,
     ];
     return lines.join('\n');
   }, []);
@@ -149,7 +144,7 @@ function ReportPageContent() {
   const handleShareReport = useCallback(async () => {
     if (!report) return;
     const text = buildReportText(report);
-    const shareData = { title: 'InterviewIQ Report', text };
+    const shareData = { title: 'InterviewIQ Technical Report', text };
 
     try {
       if (navigator.share) {
@@ -171,18 +166,17 @@ function ReportPageContent() {
         setShareState('failed');
       }
     } finally {
-      setTimeout(() => setShareState('idle'), 3000);
+      setTimeout(() => setShareState('idle'), 2500);
     }
   }, [report, buildReportText]);
 
   if (isLoading) {
     return (
       <div className="min-h-screen pt-24 flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-12 h-12 border-2 border-blue-200 border-t-blue-500 rounded-full"
-        />
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin mx-auto" />
+          <p className="text-xs text-slate-500 font-medium">Generating performance report...</p>
+        </div>
       </div>
     );
   }
@@ -190,20 +184,16 @@ function ReportPageContent() {
   if (error || !report) {
     return (
       <div className="min-h-screen pt-32 flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card max-w-md w-full text-center p-8"
-        >
-          <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 w-fit mx-auto mb-5">
-            <AlertCircle className="w-8 h-8 text-rose-500" />
+        <div className="card max-w-md w-full text-center p-8 bg-white border border-slate-200">
+          <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold mb-2 text-slate-800">Unable to Load Report</h1>
-          <p className="text-slate-500 mb-6">{error}</p>
+          <h1 className="text-lg font-bold text-slate-900 mb-1">Unable to Load Report</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mb-6">{error || 'Session not found'}</p>
           <Link href="/" className="btn btn-primary btn-md">
-            Back to Home
+            Return to Practice
           </Link>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -212,159 +202,161 @@ function ReportPageContent() {
 
   const verdict =
     overallScore >= 8
-      ? 'Excellent performance!'
+      ? 'Strong Technical Readiness'
       : overallScore >= 6
-        ? 'Good effort! Keep practicing.'
+        ? 'Solid Foundation · Minor Gaps'
         : overallScore >= 4
-          ? 'Room for improvement.'
-          : 'More practice needed.';
+          ? 'Needs Additional Preparation'
+          : 'Early Practice Stage';
 
   return (
-    <div className="min-h-screen pt-28 pb-16 px-4">
-      <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
-            className="mx-auto mb-6"
-          >
-            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 w-fit mx-auto shadow-card">
-              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+    <div className="min-h-screen pt-24 pb-20 px-4 sm:px-6 bg-slate-50/50">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Document Header */}
+        <div className="card p-5 sm:p-6 bg-white border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="chip bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
+                Completed Technical Screen
+              </span>
+              <span className="text-xs text-slate-500">
+                Session ID: {report.session_id.slice(0, 8)}
+              </span>
             </div>
-          </motion.div>
-          <h1 className="text-4xl font-extrabold tracking-tight mb-3 text-slate-900">Interview Complete!</h1>
-          <p className="text-slate-500">Here&apos;s your performance breakdown for {report.role}</p>
-        </motion.div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+              {report.role}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500">
+              5 questions evaluated across clarity, technical depth, and answer relevance
+            </p>
+          </div>
 
-        <div className="space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="card p-8"
-          >
-            <div className="grid sm:grid-cols-2 gap-8 items-center">
-              <div className="flex flex-col items-center">
-                <p className="text-sm font-bold tracking-wider text-slate-400 mb-4">OVERALL SCORE</p>
-                <ScoreRing score={overallScore} />
-                <p className="text-slate-500 text-sm mt-4">{verdict}</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className={cn('p-4 rounded-xl border', getRecommendationColor(report.recommendation))}>
-                  <p className="text-xs font-bold tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" /> RECOMMENDATION
-                  </p>
-                  <p className="text-slate-800 font-semibold text-sm leading-relaxed">{report.recommendation}</p>
-                </div>
-
-                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
-                  <p className="text-xs font-bold tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
-                    <Cpu className="w-3.5 h-3.5" /> SESSION
-                  </p>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-500">API calls used</span>
-                    <span className="text-slate-800 font-bold">{report.api_calls_used}/3</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="space-y-6"
-          >
-            <h2 className="text-2xl font-extrabold tracking-tight flex items-center gap-2 text-slate-800">
-              <Target className="w-5 h-5 text-blue-500" /> Performance Breakdown
-            </h2>
-
-            <div className="grid md:grid-cols-2 gap-5">
-              <div className="card p-6 border-emerald-200">
-                <h3 className="text-lg font-bold text-emerald-700 mb-4 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" /> Key Strengths
-                </h3>
-                <ul className="space-y-3">
-                  {report.strengths.length === 0 ? (
-                    <li className="text-sm text-slate-400">No strengths recorded.</li>
-                  ) : (
-                    report.strengths.map((strength: string, idx: number) => (
-                      <motion.li
-                        key={idx}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + idx * 0.08 }}
-                        className="flex items-start gap-3 text-slate-700"
-                      >
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0" />
-                        <span className="text-sm">{strength}</span>
-                      </motion.li>
-                    ))
-                  )}
-                </ul>
-              </div>
-
-              <div className="card p-6 border-amber-200">
-                <h3 className="text-lg font-bold text-amber-700 mb-4 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5" /> Areas for Improvement
-                </h3>
-                <ul className="space-y-3">
-                  {report.weaknesses.length === 0 ? (
-                    <li className="text-sm text-slate-400">No weaknesses recorded.</li>
-                  ) : (
-                    report.weaknesses.map((weakness: string, idx: number) => (
-                      <motion.li
-                        key={idx}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + idx * 0.08 }}
-                        className="flex items-start gap-3 text-slate-700"
-                      >
-                        <span className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 flex-shrink-0" />
-                        <span className="text-sm">{weakness}</span>
-                      </motion.li>
-                    ))
-                  )}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-3 justify-center pt-4"
-          >
-            <button onClick={handleDownloadReport} className="btn btn-secondary btn-md">
-              <Download className="w-4 h-4" /> Download Report
+          <div className="flex items-center gap-2 self-start sm:self-center">
+            <button onClick={handleDownloadReport} className="btn btn-secondary btn-sm">
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              <span>Download (.md)</span>
             </button>
-            <button onClick={handleShareReport} className="btn btn-secondary btn-md">
+            <button onClick={handleShareReport} className="btn btn-secondary btn-sm">
               {shareState === 'copied' ? (
-                <Check className="w-4 h-4 text-emerald-500" />
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Copied!</span>
+                </>
               ) : (
-                <Share2 className="w-4 h-4" />
+                <>
+                  <Share2 className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Share</span>
+                </>
               )}
-              {shareState === 'copied'
-                ? 'Copied to Clipboard'
-                : shareState === 'failed'
-                  ? 'Copy Failed'
-                  : 'Share Report'}
             </button>
-            <Link href="/history" className="btn btn-secondary btn-md">
-              View History
-            </Link>
-            <button onClick={startNewInterview} className="btn btn-primary btn-md">
-              <Home className="w-4 h-4" /> New Interview
+          </div>
+        </div>
+
+        {/* Score Card Hero */}
+        <div className="card p-6 sm:p-8 bg-white border border-slate-200/90 shadow-sm">
+          <div className="grid sm:grid-cols-12 gap-8 items-center">
+            {/* Left: Score Ring */}
+            <div className="sm:col-span-5 text-center sm:border-r sm:border-slate-200/80 sm:pr-6">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">
+                Overall Assessment
+              </h3>
+              <ScoreRing score={overallScore} />
+              <div className="mt-4">
+                <span className="inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-800 font-semibold text-xs border border-slate-200">
+                  {verdict}
+                </span>
+              </div>
+            </div>
+
+            {/* Right: Recommendation & Metrics */}
+            <div className="sm:col-span-7 space-y-4">
+              <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                  Hiring Recommendation
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
+                  {report.recommendation}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="border border-slate-200 rounded-lg p-3 bg-white">
+                  <span className="text-slate-500 block mb-0.5">Questions Evaluated</span>
+                  <span className="text-base font-bold text-slate-900">5 of 5</span>
+                </div>
+                <div className="border border-slate-200 rounded-lg p-3 bg-white">
+                  <span className="text-slate-500 block mb-0.5">Session Benchmark</span>
+                  <span className="text-base font-bold text-slate-900">
+                    {overallScore >= 7 ? 'Top Tier' : 'Mid Benchmark'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Breakdown: Strengths & Weaknesses */}
+        <div className="grid md:grid-cols-2 gap-5">
+          {/* Strengths */}
+          <div className="card p-5 sm:p-6 bg-white border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+              <div className="w-7 h-7 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-900">Demonstrated Strengths</h3>
+            </div>
+            <ul className="space-y-2.5">
+              {report.strengths.length === 0 ? (
+                <li className="text-xs text-slate-400">No specific strengths recorded.</li>
+              ) : (
+                report.strengths.map((str, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>{str}</span>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+
+          {/* Growth Areas */}
+          <div className="card p-5 sm:p-6 bg-white border border-slate-200 shadow-sm">
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+              <div className="w-7 h-7 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center">
+                <AlertCircle className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-900">Targeted Areas for Growth</h3>
+            </div>
+            <ul className="space-y-2.5">
+              {report.weaknesses.length === 0 ? (
+                <li className="text-xs text-slate-400">No specific weaknesses recorded.</li>
+              ) : (
+                report.weaknesses.map((weak, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0" />
+                    <span>{weak}</span>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
+          <Link href="/history" className="text-xs font-semibold text-slate-600 hover:text-blue-600">
+            ← View All Past Interviews
+          </Link>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={startNewInterview}
+              className="btn btn-primary btn-md w-full sm:w-auto"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Practice Another Role</span>
             </button>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

@@ -29,4 +29,5 @@ const nextConfig: NextConfig = {
   },
 };
 
+// InterviewIQ Next.js configuration
 export default nextConfig;

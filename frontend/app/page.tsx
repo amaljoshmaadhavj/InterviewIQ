@@ -1,136 +1,164 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   BrainCircuit,
   Zap,
   BarChart3,
   ArrowRight,
   Sparkles,
-  MessageSquare,
-  Timer,
-  ShieldCheck,
   CheckCircle2,
   FileUp,
+  Layers,
+  Check,
 } from 'lucide-react';
 import { UploadZone } from '@/components/UploadZone';
 import { useApp } from '@/context/AppContext';
 import { useRouter } from 'next/navigation';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: 'easeOut' } },
-};
-
 const features = [
   {
     icon: BrainCircuit,
-    title: 'Adaptive AI Interviewer',
+    title: 'Resume-Aware Questions',
     description:
-      'A senior technical interviewer that reads your resume and asks role-specific questions that get harder as you improve.',
-    accent: 'from-blue-50 to-cyan-50 border-blue-200 text-blue-600',
-    iconBg: 'from-blue-500 to-cyan-400',
+      'Our AI analyzes your projects, technical skills, and experience level to ask realistic questions tailored to what hiring managers look for.',
+    tag: 'Personalized',
   },
   {
     icon: Zap,
-    title: 'Real-Time Feedback',
+    title: 'Instant Answer Scoring',
     description:
-      'Instant scoring on clarity, depth, and relevance after every answer — so you know exactly what to fix.',
-    accent: 'from-cyan-50 to-sky-50 border-cyan-200 text-cyan-600',
-    iconBg: 'from-cyan-400 to-sky-400',
+      'Get scored on clarity, technical depth, and answer relevance after every response, so you know exactly where you stand and what to improve.',
+    tag: 'Real-time',
+  },
+  {
+    icon: Layers,
+    title: 'Multiple Engineering Roles',
+    description:
+      'Practice across Frontend, Backend, Full Stack, DevOps, Data Science, and AI/ML tracks with calibrated role difficulty.',
+    tag: 'Comprehensive',
   },
   {
     icon: BarChart3,
-    title: 'Detailed Reports',
+    title: 'Comprehensive Final Report',
     description:
-      'Comprehensive performance breakdowns, strengths, weaknesses, and actionable recommendations after each session.',
-    accent: 'from-emerald-50 to-teal-50 border-emerald-200 text-emerald-600',
-    iconBg: 'from-emerald-400 to-teal-400',
-  },
-  {
-    icon: Timer,
-    title: 'Fast & Focused',
-    description:
-      'A complete mock interview in 5–10 minutes. No long setup, no fluff — just targeted practice.',
-    accent: 'from-amber-50 to-orange-50 border-amber-200 text-amber-500',
-    iconBg: 'from-amber-400 to-orange-400',
+      'Finish your 5-question interview and receive a full performance breakdown with identified strengths, weaknesses, and next steps.',
+    tag: 'Actionable',
   },
 ];
 
 const stats = [
-  { value: '5', label: 'Adaptive questions per interview' },
-  { value: '0–10', label: 'Instant score on every answer' },
-  { value: '10+', label: 'Engineering roles to practice' },
-  { value: '3', label: 'Fast AI calls per full session' },
+  { value: '5', label: 'Adaptive questions', sub: 'Calibrated per mock interview' },
+  { value: '0–10', label: 'Instant scoring', sub: 'Evaluated on clarity & depth' },
+  { value: '8+', label: 'Technical roles', sub: 'From Frontend to AI/ML tracks' },
+  { value: '10 min', label: 'Fast & focused', sub: 'Practical practice loop' },
 ];
 
-function InterviewPreviewCard() {
+function RealisticInterviewPreview() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.7, delay: 0.3, ease: 'easeOut' }}
-      className="relative mx-auto max-w-md w-full"
-    >
-      {/* Glow */}
-      <div className="absolute -inset-10 bg-gradient-to-tr from-blue-400/25 via-transparent to-cyan-300/25 rounded-[2rem] blur-3xl" />
-
-      <div className="relative card overflow-hidden shadow-card-lg">
-        {/* Card header */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100 bg-blue-50/40">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400">
-            <BrainCircuit className="w-4 h-4 text-white" />
+    <div className="relative mx-auto max-w-lg w-full">
+      {/* Product preview window */}
+      <div className="card overflow-hidden border border-slate-200/90 shadow-card-lg bg-white">
+        {/* Window Chrome / Titlebar */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50/80">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+            <span className="ml-2 text-xs font-medium text-slate-600 hidden sm:inline">
+              Backend Engineer · Technical Screen
+            </span>
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-bold text-slate-800">Senior AI Interviewer</p>
-            <p className="text-xs text-emerald-600 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Online · ready to challenge you
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 border border-emerald-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live Round
+            </span>
+            <span className="text-xs font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+              Q 1/5
+            </span>
+          </div>
+        </div>
+
+        {/* Mock Conversation */}
+        <div className="p-4 sm:p-5 space-y-3.5 bg-slate-50/40 text-left">
+          {/* Interviewer Question */}
+          <div className="flex items-start gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+              AI
+            </div>
+            <div className="max-w-[90%] rounded-xl rounded-tl-sm bg-white border border-slate-200 p-3.5 shadow-sm">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-semibold text-slate-900">Interviewer</span>
+                <span className="text-[11px] text-slate-400">Just now</span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                Based on the distributed caching project on your resume, how did you handle cache invalidation
+                across replica nodes during sudden traffic spikes?
+              </p>
+            </div>
+          </div>
+
+          {/* Candidate Response */}
+          <div className="flex items-start justify-end gap-2.5">
+            <div className="max-w-[90%] rounded-xl rounded-tr-sm bg-blue-600 text-white p-3.5 shadow-sm">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium text-blue-100">Your Response</span>
+                <span className="text-[11px] text-blue-200">Answered</span>
+              </div>
+              <p className="text-xs sm:text-sm text-white/95 leading-relaxed">
+                We implemented Redis Pub/Sub for cross-node invalidation messages paired with TTL leases.
+                During write bursts, we queued invalidation updates to prevent thundering herds on PostgreSQL.
+              </p>
+            </div>
+          </div>
+
+          {/* Real-time Feedback Card */}
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3.5">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-bold text-emerald-800 tracking-wide uppercase">
+                  Real-Time Evaluation
+                </span>
+              </div>
+              <div className="inline-flex items-baseline gap-1 bg-white px-2 py-0.5 rounded-md border border-emerald-200">
+                <span className="text-xs text-slate-500 font-medium">Score:</span>
+                <span className="text-sm font-bold text-emerald-600">8.5</span>
+                <span className="text-[10px] text-slate-400 font-medium">/10</span>
+              </div>
+            </div>
+
+            {/* Rubric Meters */}
+            <div className="grid grid-cols-3 gap-2 mb-2 text-center text-[11px]">
+              <div className="bg-white/90 rounded border border-emerald-100 p-1.5">
+                <span className="text-slate-500 block">Clarity</span>
+                <span className="font-semibold text-slate-800">4.5/5</span>
+              </div>
+              <div className="bg-white/90 rounded border border-emerald-100 p-1.5">
+                <span className="text-slate-500 block">Depth</span>
+                <span className="font-semibold text-slate-800">4.2/5</span>
+              </div>
+              <div className="bg-white/90 rounded border border-emerald-100 p-1.5">
+                <span className="text-slate-500 block">Relevance</span>
+                <span className="font-semibold text-slate-800">4.8/5</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-600 leading-snug">
+              <span className="font-semibold text-slate-800">Feedback:</span> Clear architectural thinking on
+              pub/sub and queue buffering. Consider noting eventual consistency trade-offs.
             </p>
           </div>
-          <span className="chip bg-blue-100 text-blue-700 border border-blue-200">Q 1/5</span>
         </div>
 
-        {/* Messages */}
-        <div className="p-5 space-y-4">
-          <div className="flex justify-start">
-            <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-slate-100 border border-slate-200/80 px-4 py-3">
-              <p className="text-sm text-slate-700 leading-relaxed">
-                Based on your experience with distributed systems, walk me through how you would design a
-                rate-limiter for a high-traffic API.
-              </p>
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-blue-500 to-cyan-500 px-4 py-3 shadow-float">
-              <p className="text-sm text-white leading-relaxed">
-                I&apos;d start with a token bucket algorithm, then consider Redis-backed counters for
-                distributed consistency…
-              </p>
-            </div>
-          </div>
-          <div className="flex justify-start">
-            <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-emerald-50 border border-emerald-200 px-4 py-3">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-emerald-700">FEEDBACK</span>
-                <span className="text-sm font-extrabold text-emerald-600">8.5/10</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Strong architectural thinking. Consider edge cases like clock skew and cleanup of idle tokens.
-              </p>
-            </div>
-          </div>
+        {/* Footer info bar */}
+        <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+          <span>Target: Senior Backend Engineer</span>
+          <span>Adaptive difficulty: Active</span>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -151,159 +179,206 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen">
       {/* ===== Hero ===== */}
-      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        {/* Decorative floating blobs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-300/20 rounded-full blur-3xl animate-blob-drift pointer-events-none" />
-        <div className="absolute top-40 right-16 w-64 h-64 bg-cyan-300/20 rounded-full blur-3xl animate-blob-drift pointer-events-none" style={{ animationDelay: '6s' }} />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-96 h-56 bg-indigo-200/20 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative z-10">
-          <motion.div variants={containerVariants} initial="hidden" animate="visible">
-            <motion.div variants={itemVariants}>
-              <span className="chip bg-blue-100 text-blue-700 border border-blue-200 mb-6">
-                <Sparkles className="w-3.5 h-3.5" />
-                AI-Powered Interview Practice
+      <section className="relative pt-28 sm:pt-32 pb-16 sm:pb-20 px-4">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          {/* Left Hero Content */}
+          <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
+            <div>
+              <span className="chip bg-blue-50 text-blue-700 border border-blue-200/90 font-medium mb-3">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                Student & Candidate Practice Platform
               </span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              variants={itemVariants}
-              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] mb-6 text-slate-900"
-            >
-              Master <span className="gradient-text">technical interviews</span> with an AI that knows your resume
-            </motion.h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-[1.15]">
+              Master technical interviews with an AI that{' '}
+              <span className="text-blue-600">knows your resume</span>
+            </h1>
 
-            <motion.p variants={itemVariants} className="text-lg text-slate-500 mb-9 max-w-xl leading-relaxed">
-              Upload your resume, pick a role, and practice with a senior interviewer who asks adaptive questions
-              and scores every answer on clarity, depth, and relevance.
-            </motion.p>
+            <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Upload your resume, select a technical role, and practice with a senior interviewer that asks
+              role-specific questions and scores every answer on clarity, depth, and relevance.
+            </p>
 
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
-              <button onClick={() => scrollTo('upload-section')} className="btn btn-primary btn-lg focus-ring">
-                Start Practicing <ArrowRight className="w-4 h-4" />
+            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2">
+              <button
+                onClick={() => scrollTo('upload-section')}
+                className="btn btn-primary btn-lg"
+              >
+                <span>Start Practice</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
-              <button onClick={() => scrollTo('features-section')} className="btn btn-secondary btn-lg focus-ring">
-                Learn More
+              <button
+                onClick={() => scrollTo('features-section')}
+                className="btn btn-secondary btn-lg"
+              >
+                How It Works
               </button>
-            </motion.div>
+            </div>
 
-            <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-10 text-sm text-slate-500">
-              <span className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" /> Free, no card required
+            {/* Trust Badges */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 pt-4 text-xs font-medium text-slate-500 border-t border-slate-200/80">
+              <span className="flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-emerald-600" /> Free for students
               </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-blue-500" /> Resume-aware questions
+              <span className="flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-blue-600" /> Reads real resume projects
               </span>
-            </motion.div>
-          </motion.div>
+              <span className="flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-sky-600" /> 0–10 instant score rubric
+              </span>
+            </div>
+          </div>
 
-          <InterviewPreviewCard />
+          {/* Right Hero Product Preview */}
+          <div className="lg:col-span-6">
+            <RealisticInterviewPreview />
+          </div>
         </div>
       </section>
 
-      {/* ===== Stats band ===== */}
-      <section className="px-4 py-10">
+      {/* ===== Stats Band ===== */}
+      <section className="px-4 py-8 bg-slate-50 border-y border-slate-200/80">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            className="card grid grid-cols-2 md:grid-cols-4 gap-px overflow-hidden shadow-card"
-          >
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {stats.map((stat) => (
-              <div key={stat.label} className="p-6 text-center">
-                <p className="text-3xl font-extrabold tracking-tight gradient-text">{stat.value}</p>
-                <p className="mt-1 text-xs text-slate-500">{stat.label}</p>
+              <div key={stat.label} className="text-center sm:text-left">
+                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+                  {stat.value}
+                </p>
+                <p className="text-sm font-semibold text-slate-800 mt-1">{stat.label}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{stat.sub}</p>
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ===== Features ===== */}
-      <section id="features-section" className="px-4 py-20 scroll-mt-20">
+      {/* ===== Features Section ===== */}
+      <section id="features-section" className="px-4 py-20 scroll-mt-16">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            className="text-center max-w-2xl mx-auto mb-14"
-          >
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-slate-900">
-              Everything you need to <span className="gradient-text">walk in prepared</span>
+          <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
+            <span className="chip bg-slate-100 text-slate-700 border border-slate-200 font-medium">
+              Structured Preparation
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+              Everything you need to interview with confidence
             </h2>
-            <p className="text-slate-500 text-lg">
-              A focused, realistic practice loop that turns interview anxiety into confidence.
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+              Designed specifically to help engineering students and job candidates practice realistic technical
+              rounds without expensive tutoring or stressful trial-and-error.
             </p>
-          </motion.div>
+          </div>
 
-          <div className="grid sm:grid-cols-2 gap-5">
-            {features.map((feature, idx) => {
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <motion.div
+                <div
                   key={feature.title}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ delay: idx * 0.06 }}
-                  className="card-hover group p-6"
+                  className="card p-5 sm:p-6 hover:border-slate-300 hover:shadow-card-hover transition-all duration-200 flex flex-col justify-between"
                 >
-                  <div className={`p-3 rounded-2xl bg-gradient-to-br border w-fit mb-5 ${feature.accent} group-hover:scale-105 transition-transform`}>
-                    <Icon className="w-5 h-5" />
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200/60 text-blue-600 flex items-center justify-center">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                        {feature.tag}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-slate-900 mb-2">{feature.title}</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                      {feature.description}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-800 mb-2">{feature.title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{feature.description}</p>
-                </motion.div>
+                </div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* ===== Upload / CTA ===== */}
-      <section id="upload-section" className="px-4 py-20 scroll-mt-20">
-        <div className="max-w-2xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            className="text-center mb-12"
-          >
-            <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 border border-blue-200 mb-6">
-              <FileUp className="w-6 h-6 text-blue-600" />
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 text-slate-900">
-              Ready to practice?
+      {/* ===== Practice Process Steps ===== */}
+      <section className="px-4 py-16 bg-slate-50/70 border-y border-slate-200/80">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 mb-2">
+              Three simple steps to practice
             </h2>
-            <p className="text-slate-500 text-lg">
-              Upload your resume and we&apos;ll tailor interview questions to your real experience.
-            </p>
-          </motion.div>
+            <p className="text-sm text-slate-500">Fast, focused, and free — complete a mock round in 10 minutes</p>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: '-80px' }}
-          >
-            <UploadZone />
-          </motion.div>
+          <div className="grid sm:grid-cols-3 gap-6">
+            <div className="card p-6 bg-white">
+              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center mb-4">
+                1
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 mb-1">Upload Your Resume</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Provide your resume in PDF format. We parse your real skills, frameworks, and projects.
+              </p>
+            </div>
+
+            <div className="card p-6 bg-white">
+              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center mb-4">
+                2
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 mb-1">Select Target Role</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Choose Frontend, Backend, Full Stack, or AI/ML to set calibrated question tracks.
+              </p>
+            </div>
+
+            <div className="card p-6 bg-white">
+              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center mb-4">
+                3
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 mb-1">Answer & Get Scored</h3>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Respond to 5 adaptive questions and review immediate feedback and a full final performance report.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== Upload Section ===== */}
+      <section id="upload-section" className="px-4 py-20 scroll-mt-16">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8 space-y-2">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200/80 text-blue-600 flex items-center justify-center mx-auto mb-3">
+              <FileUp className="w-5 h-5" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+              Start Your Practice Session
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600">
+              Upload your PDF resume to calibrate questions to your background and experience.
+            </p>
+          </div>
+
+          <UploadZone />
         </div>
       </section>
 
       {/* ===== Footer ===== */}
-      <footer className="border-t border-slate-200/80 py-10 px-4 mt-8">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
-          <p className="flex items-center gap-2">
-            <BrainCircuit className="w-4 h-4 text-blue-500" />
-            <span className="font-bold text-slate-600">
-              Interview<span className="gradient-text">IQ</span>
+      <footer className="border-t border-slate-200 py-10 px-4 bg-white">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-blue-600 flex items-center justify-center text-white">
+              <BrainCircuit className="w-3.5 h-3.5" />
+            </div>
+            <span className="font-bold text-slate-800 text-sm">
+              Interview<span className="text-blue-600">IQ</span>
             </span>
-          </p>
+            <span className="text-slate-300">|</span>
+            <span>Student Interview Preparation Platform</span>
+          </div>
           <p>&copy; {new Date().getFullYear()} InterviewIQ. All rights reserved.</p>
-          <p className="flex items-center gap-1.5">
-            <MessageSquare className="w-3.5 h-3.5" /> Built for serious candidates
-          </p>
+          <div className="flex items-center gap-4 text-slate-500">
+            <span>Free & Open Practice</span>
+          </div>
         </div>
       </footer>
     </div>

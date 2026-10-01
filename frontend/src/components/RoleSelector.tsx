@@ -1,22 +1,66 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, Loader2, Palette, Server, Layers, BarChart3, Rocket, BrainCircuit, ServerCog, Compass, Check, Info } from 'lucide-react';
+import {
+  ArrowRight,
+  Loader2,
+  Palette,
+  Server,
+  Layers,
+  BarChart3,
+  Rocket,
+  BrainCircuit,
+  ServerCog,
+  Compass,
+  Check,
+  Info,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/utils/cn';
 
 const ROLES = [
-  { title: 'Frontend Engineer', icon: Palette, gradient: 'from-blue-500 to-cyan-500' },
-  { title: 'Backend Engineer', icon: Server, gradient: 'from-sky-500 to-blue-500' },
-  { title: 'Full Stack Developer', icon: Layers, gradient: 'from-cyan-500 to-teal-500' },
-  { title: 'Data Scientist', icon: BarChart3, gradient: 'from-violet-500 to-blue-500' },
-  { title: 'DevOps Engineer', icon: Rocket, gradient: 'from-teal-400 to-cyan-500' },
-  { title: 'AI/ML Engineer', icon: BrainCircuit, gradient: 'from-blue-500 to-indigo-500' },
-  { title: 'Senior Backend Engineer', icon: ServerCog, gradient: 'from-sky-500 to-cyan-400' },
-  { title: 'Product Manager', icon: Compass, gradient: 'from-indigo-400 to-blue-500' },
+  {
+    title: 'Frontend Engineer',
+    icon: Palette,
+    topics: 'React, State Management, DOM, Web Vitals & CSS Architecture',
+  },
+  {
+    title: 'Backend Engineer',
+    icon: Server,
+    topics: 'API Design, Database Architecture, Concurrency & Caching',
+  },
+  {
+    title: 'Full Stack Developer',
+    icon: Layers,
+    topics: 'End-to-End Architecture, REST/GraphQL, Auth & Data Models',
+  },
+  {
+    title: 'Data Scientist',
+    icon: BarChart3,
+    topics: 'Statistics, Modeling, Data Wrangling & Feature Engineering',
+  },
+  {
+    title: 'DevOps Engineer',
+    icon: Rocket,
+    topics: 'CI/CD Pipelines, Kubernetes, Docker, Cloud & Reliability',
+  },
+  {
+    title: 'AI/ML Engineer',
+    icon: BrainCircuit,
+    topics: 'Model Architectures, Training Pipelines, LLMs & ML Systems',
+  },
+  {
+    title: 'Senior Backend Engineer',
+    icon: ServerCog,
+    topics: 'System Scalability, Distributed Transactions, Event-Driven Arch',
+  },
+  {
+    title: 'Product Manager',
+    icon: Compass,
+    topics: 'Product Discovery, Prioritization, Metrics & User Empathy',
+  },
 ];
 
 interface RoleSelectorProps {
@@ -55,160 +99,157 @@ export function RoleSelector({ onRoleSelected }: RoleSelectorProps) {
       setTimeout(() => {
         setLoading(false);
         router.push('/interview');
-      }, 500);
+      }, 400);
     } catch (error) {
       setIsStarting(false);
       setLoading(false);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to start interview';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to start interview. Please ensure backend is running.';
       setError(errorMessage);
     }
-  }, [selectedRole, state.resumeData, setSelectedRole, setCurrentQuestion, setSessionId, setLoading, setError, onRoleSelected, router]);
+  }, [
+    selectedRole,
+    state.resumeData,
+    setSelectedRole,
+    setCurrentQuestion,
+    setSessionId,
+    setLoading,
+    setError,
+    onRoleSelected,
+    router,
+  ]);
 
   return (
-    <div className="pb-12">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10 text-center"
-        >
-          <span className="chip bg-blue-100 text-blue-700 border border-blue-200 mb-5">
-            <BrainCircuit className="w-3.5 h-3.5" /> Step 2 of 2
-          </span>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-3">
-            Select your target <span className="gradient-text">role</span>
-          </h1>
-          <p className="text-slate-500 text-lg">
-            Choose the position you&apos;re interviewing for — we&apos;ll tailor questions to match.
-          </p>
-        </motion.div>
+    <div className="space-y-8">
+      {/* Step Header */}
+      <div className="text-center max-w-xl mx-auto space-y-2">
+        <span className="chip bg-blue-50 text-blue-700 border border-blue-200/90 font-medium">
+          Step 2 of 2 · Target Calibration
+        </span>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+          Select Your Target Role
+        </h1>
+        <p className="text-sm text-slate-600">
+          Pick the position you are preparing for. Questions will be tailored to this track and your resume.
+        </p>
+      </div>
 
-        {/* Role Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {ROLES.map((role, index) => {
-            const Icon = role.icon;
-            const isSelected = selectedRole === role.title;
-            return (
-              <motion.button
-                key={role.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.04, duration: 0.45 }}
-                onClick={() => setSelected(role.title)}
-                aria-pressed={isSelected}
-                className={cn(
-                  'focus-ring relative overflow-hidden rounded-2xl border-2 transition-all duration-300 text-left group',
-                  isSelected
-                    ? 'border-blue-400 bg-blue-50 shadow-card'
-                    : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/30 hover:shadow-soft hover:-translate-y-0.5'
-                )}
-              >
-                <div
-                  className={cn(
-                    'absolute inset-0 rounded-2xl bg-gradient-to-br transition-opacity duration-300 pointer-events-none',
-                    role.gradient,
-                    isSelected ? 'opacity-10' : 'opacity-0 group-hover:opacity-[0.06]'
-                  )}
-                />
-
-                <div className="relative z-10 p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div
-                      className={cn(
-                        'p-2.5 rounded-xl bg-gradient-to-br border transition-transform duration-300 group-hover:scale-105',
-                        role.gradient,
-                        'border-white/50 shadow-float'
-                      )}
-                    >
-                      <Icon className="w-5 h-5 text-white" />
-                    </div>
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="p-1.5 rounded-full bg-blue-500 text-white shadow-float"
-                      >
-                        <Check className="w-3.5 h-3.5" strokeWidth={3} />
-                      </motion.div>
+      {/* Role Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {ROLES.map((role) => {
+          const Icon = role.icon;
+          const isSelected = selectedRole === role.title;
+          return (
+            <button
+              key={role.title}
+              type="button"
+              onClick={() => setSelected(role.title)}
+              aria-pressed={isSelected}
+              className={cn(
+                'relative text-left p-4 rounded-xl border transition-all duration-150 flex flex-col justify-between group',
+                isSelected
+                  ? 'border-blue-600 bg-blue-50/50 shadow-sm ring-1 ring-blue-600/30'
+                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-sm'
+              )}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div
+                    className={cn(
+                      'w-9 h-9 rounded-lg flex items-center justify-center transition-colors',
+                      isSelected
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-blue-50 text-blue-600 border border-blue-200/60 group-hover:bg-blue-100/70'
                     )}
+                  >
+                    <Icon className="w-4 h-4" />
                   </div>
-                  <h3 className="text-slate-800 font-bold text-sm leading-snug">{role.title}</h3>
-                  {isSelected && <p className="text-xs text-blue-600 mt-1 font-semibold">Selected</p>}
+                  <div
+                    className={cn(
+                      'w-5 h-5 rounded-full flex items-center justify-center border transition-all',
+                      isSelected
+                        ? 'bg-blue-600 border-blue-600 text-white'
+                        : 'border-slate-300 bg-white group-hover:border-slate-400'
+                    )}
+                  >
+                    {isSelected && <Check className="w-3 h-3 stroke-[2.5]" />}
+                  </div>
                 </div>
-              </motion.button>
-            );
-          })}
+
+                <h3 className="text-sm font-bold text-slate-900 leading-snug">{role.title}</h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{role.topics}</p>
+              </div>
+
+              {isSelected && (
+                <div className="mt-3 pt-2 border-t border-blue-200/60 flex items-center gap-1 text-[11px] font-semibold text-blue-700">
+                  <span>Selected for interview</span>
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Start Action Bar */}
+      <div className="card p-5 sm:p-6 bg-white border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-bold text-slate-900">
+            {selectedRole ? (
+              <>Ready to start: <span className="text-blue-600">{selectedRole}</span></>
+            ) : (
+              'Please select a role above to proceed'
+            )}
+          </p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            5 questions · ~10 minutes · Real-time scoring and feedback
+          </p>
         </div>
 
-        {/* Resume context bar */}
-        {state.resumeData && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mb-8 p-4 bg-cyan-50 border border-cyan-200 rounded-2xl flex items-center gap-3"
-          >
-            <Info className="w-4 h-4 text-cyan-600 flex-shrink-0" />
-            <p className="text-cyan-700 text-sm">
-              Interviewing as{' '}
-              <span className="font-bold capitalize text-cyan-800">{state.resumeData.experience_level}</span>{' '}
-              level ·{' '}
-              <span className="font-bold text-cyan-800">{state.resumeData.skills.length}</span> skills
-              detected
-            </p>
-          </motion.div>
-        )}
-
-        {/* Start Button */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="flex justify-center"
+        <button
+          onClick={handleStartInterview}
+          disabled={!selectedRole || isStarting}
+          className="btn btn-primary btn-lg w-full sm:w-auto"
         >
-          <button
-            onClick={handleStartInterview}
-            disabled={!selectedRole || isStarting}
-            className="btn btn-primary btn-lg focus-ring"
-          >
-            <span>{isStarting ? 'Starting…' : 'Start Interview'}</span>
-            {isStarting ? (
+          {isStarting ? (
+            <>
               <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
+              <span>Starting Session...</span>
+            </>
+          ) : (
+            <>
+              <span>Begin Technical Interview</span>
               <ArrowRight className="w-4 h-4" />
-            )}
-          </button>
-        </motion.div>
+            </>
+          )}
+        </button>
+      </div>
 
-        {/* Info Box */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-12 max-w-2xl mx-auto p-6 card"
-        >
-          <h3 className="text-slate-800 font-bold mb-4 flex items-center gap-2">
-            <Info className="w-4 h-4 text-blue-500" /> How it works
-          </h3>
-          <ul className="text-slate-600 text-sm space-y-2.5">
-            <li className="flex gap-2.5">
-              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-              We&apos;ll ask <span className="text-blue-600 font-semibold">5 adaptive questions</span> based on your role and resume
-            </li>
-            <li className="flex gap-2.5">
-              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-              Answer conversationally — there are no &quot;trick&quot; questions
-            </li>
-            <li className="flex gap-2.5">
-              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-              Get <span className="text-blue-600 font-semibold">detailed feedback</span> on each answer (0–10 score)
-            </li>
-            <li className="flex gap-2.5">
-              <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-              Interview takes ~5–10 minutes after the initial setup
-            </li>
-          </ul>
-        </motion.div>
+      {/* Interview format info card */}
+      <div className="card p-5 bg-slate-50 border border-slate-200/80 rounded-xl">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-1.5">
+          <Info className="w-4 h-4 text-blue-600" />
+          Technical Screen Format
+        </h4>
+        <div className="grid sm:grid-cols-3 gap-4 text-xs text-slate-600">
+          <div className="flex items-start gap-2">
+            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0 text-[11px]">
+              1
+            </span>
+            <p>5 adaptive questions calibrated to your role and resume.</p>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0 text-[11px]">
+              2
+            </span>
+            <p>Answer naturally. Scores are evaluated on clarity, depth, and relevance.</p>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center shrink-0 text-[11px]">
+              3
+            </span>
+            <p>Receive a full downloadable report with actionable growth areas at the end.</p>
+          </div>
+        </div>
       </div>
     </div>
   );
